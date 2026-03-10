@@ -1,0 +1,16 @@
+# TM1 system objects
+}*
+
+# runtime artifacts
+*.log
+*.blb
+*.tmp
+*.feeders
+
+# OS artifacts
+Thumbs.db
+.DS_Store
+
+# local folders
+logs/
+temp/
