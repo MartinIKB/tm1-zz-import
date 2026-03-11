@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Clear_BOB",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_BOB.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

@@ -1,0 +1,12 @@
+{
+	"@type":"Process",
+	"Name":"Load_IFRS_POSITION_325",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Load_IFRS_POSITION_325.ti",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

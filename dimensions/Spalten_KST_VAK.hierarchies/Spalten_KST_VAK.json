@@ -1,0 +1,20 @@
+{
+	"@type":"Hierarchy",
+	"Name":"Spalten_KST_VAK",
+	"Elements":
+	[
+		{
+			"Name":"Monatsscheibe",
+			"Type":"String"
+		},
+		{
+			"Name":"Kostenstelle",
+			"Type":"String"
+		},
+		{
+			"Name":"VAK",
+			"Type":"String"
+		}
+	],
+	"Subsets@Code.links":[]
+}

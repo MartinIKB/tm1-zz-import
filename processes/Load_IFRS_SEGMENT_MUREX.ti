@@ -1,0 +1,29 @@
+#region Prolog
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+LogOutput( 'INFO', 'Löschen aller Daten aus STG_IFRS_MAPPING_SEGMENT_MUREX' );
+
+ODBCOutput( 'co1','truncate Table STG_IFRS_MAPPING_SEGMENT_MUREX');
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vPORTFOLIO=CellGetS( 'Import_IFRS_SEGMENT_MUREX', 'PORTFOLIO', vZeile );
+    vMUREX_SEGMENT=CellGetS( 'Import_IFRS_SEGMENT_MUREX', 'MUREX_SEGMENT', vZeile );
+    vMUREX_TEAM=CellGetS( 'Import_IFRS_SEGMENT_MUREX', 'MUREX_TEAM', vZeile );
+    if (vPORTFOLIO@<>'');
+        vSQL='insert into STG_IFRS_MAPPING_SEGMENT_MUREX values('''|vPORTFOLIO|''','''|vMUREX_SEGMENT|''','''|vMUREX_TEAM|''',sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+
+ODBCClose( 'co1' );
+#endregion

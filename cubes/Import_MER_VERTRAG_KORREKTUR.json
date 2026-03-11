@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_MER_VERTRAG_KORREKTUR",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_MER_VERTRAG_KORREKTUR')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_MER_VERTRAG_KORREKTUR.views/Default.json"
+	]
+}

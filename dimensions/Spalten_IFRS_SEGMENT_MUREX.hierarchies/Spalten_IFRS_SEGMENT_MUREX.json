@@ -1,0 +1,20 @@
+{
+	"@type":"Hierarchy",
+	"Name":"Spalten_IFRS_SEGMENT_MUREX",
+	"Elements":
+	[
+		{
+			"Name":"PORTFOLIO",
+			"Type":"String"
+		},
+		{
+			"Name":"MUREX_SEGMENT",
+			"Type":"String"
+		},
+		{
+			"Name":"MUREX_TEAM",
+			"Type":"String"
+		}
+	],
+	"Subsets@Code.links":[]
+}

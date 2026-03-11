@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Load_BER_KD_MAN",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Load_BER_KD_MAN.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

@@ -1,0 +1,32 @@
+{
+	"@type":"Hierarchy",
+	"Name":"Spalten_KST_MELDEDATEN",
+	"Elements":
+	[
+		{
+			"Name":"MONATSSCHEIBE",
+			"Type":"String"
+		},
+		{
+			"Name":"GESELLSCHAFT",
+			"Type":"String"
+		},
+		{
+			"Name":"GESBEZ",
+			"Type":"String"
+		},
+		{
+			"Name":"KOSTENART",
+			"Type":"String"
+		},
+		{
+			"Name":"KOABEZ",
+			"Type":"String"
+		},
+		{
+			"Name":"WERT",
+			"Type":"String"
+		}
+	],
+	"Subsets@Code.links":[]
+}

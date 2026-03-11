@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_IFRS_IFRS",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_IFRS_IFRS')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_IFRS_IFRS.views/Default.json"
+	]
+}

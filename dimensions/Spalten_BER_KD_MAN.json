@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_BER_KD_MAN",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_BER_KD_MAN.hierarchies/Spalten_BER_KD_MAN.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_BER_KD_MAN')/Hierarchies('Spalten_BER_KD_MAN')"
+	}
+}

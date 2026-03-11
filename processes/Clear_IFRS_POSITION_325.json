@@ -1,0 +1,12 @@
+{
+	"@type":"Process",
+	"Name":"Clear_IFRS_POSITION_325",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_IFRS_POSITION_325.ti",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

@@ -1,0 +1,3 @@
+#region Prolog
+CubeClearData('Import_IFRS_SEGMENT_MUREX');
+#endregion

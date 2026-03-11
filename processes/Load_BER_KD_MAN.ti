@@ -1,0 +1,100 @@
+#region Prolog
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+vBER_STICHDAT_Default=CellGetS( 'Import_BER_KD_MAN', 'BER_STICHDAT', 'Zeile_1' );
+#Umwandlung der Datumswerte vom fünfstelligen Excelformat in DD.MM.YYYY
+if (long(vBER_STICHDAT_Default)=5);
+        vBER_STICHDAT_Default_Excel=NUMBR( vBER_STICHDAT_Default );
+        vBER_STICHDAT_Default=FormatDate( vBER_STICHDAT_Default_Excel, 'dd.MM.yyyy' );
+endif;
+
+LogOutput( 'INFO', 'Löschen des Stichtags '|vBER_STICHDAT_Default| ' aus CSV_PV_KD_MAN' );
+ODBCOutput( 'co1','delete from CSV_PV_KD_MAN where ber_stichdat=TO_DATE('''|vBER_STICHDAT_Default|''', ''DD.MM.YYYY'')');
+
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+#Auslesen der Stringwerte aus dem Cube
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vBER_STICHDAT=CellGetS( 'Import_BER_KD_MAN', 'BER_STICHDAT', vZeile );
+    vKD_NR=CellGetS( 'Import_BER_KD_MAN', 'KD_NR', vZeile );
+    vKBEZ=CellGetS( 'Import_BER_KD_MAN', 'KBEZ', vZeile );
+    vFAIR_VALUE_ERGEBNIS=CellGetS( 'Import_BER_KD_MAN', 'FAIR_VALUE_ERGEBNIS', vZeile );
+    vSONSTIGES_PROVISIONEN=CellGetS( 'Import_BER_KD_MAN', 'SONSTIGES_PROVISIONEN', vZeile );
+    vBETREUUNGS_SEGMENT=CellGetS( 'Import_BER_KD_MAN', 'BETREUUNGS_SEGMENT', vZeile );
+    vAVS=CellGetS( 'Import_BER_KD_MAN', 'AVS', vZeile );
+    vBONITAET=CellGetS( 'Import_BER_KD_MAN', 'BONITAET', vZeile );
+    vSONSTIGES_ZINSUEBERSCHUSS=CellGetS( 'Import_BER_KD_MAN', 'SONSTIGES_ZINSUEBERSCHUSS', vZeile );
+    vFINANZANLAGEERGEBNIS=CellGetS( 'Import_BER_KD_MAN', 'FINANZANLAGEERGEBNIS', vZeile );
+    vENGA_ZUORD_KZ=CellGetS( 'Import_BER_KD_MAN', 'ENGA_ZUORD_KZ', vZeile );
+    vZINSLOSSTELLUNG=CellGetS( 'Import_BER_KD_MAN', 'ZINSLOSSTELLUNG', vZeile );
+    vCORPORATELAB_AVALPROVISION=CellGetS( 'Import_BER_KD_MAN', 'CORPORATELAB_AVALPROVISION', vZeile );
+    vVVS=CellGetS( 'Import_BER_KD_MAN', 'VVS', vZeile );
+    vPVS=CellGetS( 'Import_BER_KD_MAN', 'PVS', vZeile );
+    vBPM=CellGetS( 'Import_BER_KD_MAN', 'BPM', vZeile );
+    vEWB=CellGetS( 'Import_BER_KD_MAN', 'EWB', vZeile );
+    vPOWB=CellGetS( 'Import_BER_KD_MAN', 'POWB', vZeile );
+    vEINGAENGE_ABGESCHR_FORDERUNGEN=CellGetS( 'Import_BER_KD_MAN', 'EINGAENGE_ABGESCHR_FORDERUNGEN', vZeile );
+    vABS_ERGEBNIS=CellGetS( 'Import_BER_KD_MAN', 'ABS_ERGEBNIS', vZeile );
+    vGUTACHTERKOSTEN=CellGetS( 'Import_BER_KD_MAN', 'GUTACHTERKOSTEN', vZeile );
+    vRISIKO_MT_NR=CellGetS( 'Import_BER_KD_MAN', 'RISIKO_MT_NR', vZeile );
+    vKBEZ_Escaped = '';
+
+    #Löschen der Apostrophe aus KBEZ
+    iChar = 1;
+    vLength = Long(vKBEZ);
+    While (iChar <= vLength);
+        vCurrentChar = SubSt(vKBEZ, iChar, 1);
+        If (vCurrentChar @= '''');
+            vKBEZ_Escaped = vKBEZ_Escaped | '''''';
+        Else;
+            vKBEZ_Escaped = vKBEZ_Escaped | vCurrentChar;
+        EndIf;
+        iChar = iChar + 1;
+    End;
+
+    #Umwandlung der Datumswerte vom fünfstelligen Excelformat in DD.MM.YYYY
+    if (long(vBER_STICHDAT)=5);
+        vBER_STICHDAT_Excel=NUMBR( vBER_STICHDAT );
+        vBER_STICHDAT=FormatDate( vBER_STICHDAT_Excel, 'dd.MM.yyyy' );
+        CellPutS( vBER_STICHDAT, 'Import_BER_KD_MAN', 'BER_STICHDAT', vZeile );
+    endif;
+
+    #Ersetzen von , durch . in den Numberwerten
+    if (vBER_STICHDAT@<>'');
+        vBER_STICHDAT_SQL=IF (vBER_STICHDAT@='', 'NULL', 'TO_DATE('''|vBER_STICHDAT|''', ''DD.MM.YYYY'')');
+        vKD_NR_SQL=IF (vKD_NR@='', 'NULL', 'REPLACE('''|vKD_NR|''', '','', ''.'')');
+        vKBEZ_SQL=IF (vKBEZ@='', 'NULL', ''''|vKBEZ_Escaped|'''');
+        vFAIR_VALUE_ERGEBNIS_SQL=IF (vFAIR_VALUE_ERGEBNIS@='', 'NULL', 'REPLACE('''|vFAIR_VALUE_ERGEBNIS|''', '','', ''.'')');
+        vSONSTIGES_PROVISIONEN_SQL=IF (vSONSTIGES_PROVISIONEN@='', 'NULL', 'REPLACE('''|vSONSTIGES_PROVISIONEN|''', '','', ''.'')');
+        vBETREUUNGS_SEGMENT_SQL=IF (vBETREUUNGS_SEGMENT@='', 'NULL', ''''|vBETREUUNGS_SEGMENT|'''');
+        vAVS_SQL=IF (vAVS@='', 'NULL', ''''|vAVS|'''');
+        vBONITAET_SQL=IF (vBONITAET@='', 'NULL', 'REPLACE('''|vBONITAET|''', '','', ''.'')');
+        vSONSTIGES_ZINSUEBERSCHUSS_SQL=IF (vSONSTIGES_ZINSUEBERSCHUSS@='', 'NULL', 'REPLACE('''|vSONSTIGES_ZINSUEBERSCHUSS|''', '','', ''.'')');
+        vFINANZANLAGEERGEBNIS_SQL=IF (vFINANZANLAGEERGEBNIS@='', 'NULL', 'REPLACE('''|vFINANZANLAGEERGEBNIS|''', '','', ''.'')');
+        vENGA_ZUORD_KZ_SQL=IF (vENGA_ZUORD_KZ@='', 'NULL', ''''|vENGA_ZUORD_KZ|'''');
+        vZINSLOSSTELLUNG_SQL=IF (vZINSLOSSTELLUNG@='', 'NULL', 'REPLACE('''|vZINSLOSSTELLUNG|''', '','', ''.'')');
+        vCORPORATELAB_AVALPROVISION_SQL=IF (vCORPORATELAB_AVALPROVISION@='', 'NULL', 'REPLACE('''|vCORPORATELAB_AVALPROVISION|''', '','', ''.'')');
+        vVVS_SQL=IF (vVVS@='', 'NULL', ''''|vVVS|'''');
+        vPVS_SQL=IF (vPVS@='', 'NULL', ''''|vPVS|'''');
+        vBPM_SQL=IF (vBPM@='', 'NULL', ''''|vBPM|'''');
+        vEWB_SQL=IF (vEWB@='', 'NULL', 'REPLACE('''|vEWB|''', '','', ''.'')');
+        vPOWB_SQL=IF (vPOWB@='', 'NULL', 'REPLACE('''|vPOWB|''', '','', ''.'')');
+        vEINGAENGE_ABGESCHR_FORDERUNGEN_SQL=IF (vEINGAENGE_ABGESCHR_FORDERUNGEN@='', 'NULL', 'REPLACE('''|vEINGAENGE_ABGESCHR_FORDERUNGEN|''', '','', ''.'')');
+        vABS_ERGEBNIS_SQL=IF (vABS_ERGEBNIS@='', 'NULL', 'REPLACE('''|vABS_ERGEBNIS|''', '','', ''.'')');
+        vGUTACHTERKOSTEN_SQL=IF (vGUTACHTERKOSTEN@='', 'NULL', 'REPLACE('''|vGUTACHTERKOSTEN|''', '','', ''.'')');
+        vRISIKO_MT_NR_SQL=IF (vRISIKO_MT_NR@='', 'NULL', 'REPLACE('''|vRISIKO_MT_NR|''', '','', ''.'')');
+        vSQL='insert into CSV_PV_KD_MAN values(' | vBER_STICHDAT_SQL | ',' | vKD_NR_SQL | ',' | vKBEZ_SQL | ',' | vFAIR_VALUE_ERGEBNIS_SQL | ',' | vSONSTIGES_PROVISIONEN_SQL | ',' | vBETREUUNGS_SEGMENT_SQL | ',' | vAVS_SQL | ',' | vBONITAET_SQL | ',' | vSONSTIGES_ZINSUEBERSCHUSS_SQL | ',' | vFINANZANLAGEERGEBNIS_SQL | ',' | vENGA_ZUORD_KZ_SQL | ',' | vZINSLOSSTELLUNG_SQL | ',' | vCORPORATELAB_AVALPROVISION_SQL | ',' | vVVS_SQL | ',' | vPVS_SQL | ',' | vBPM_SQL | ',' | vEWB_SQL | ',' | vPOWB_SQL | ',' | vEINGAENGE_ABGESCHR_FORDERUNGEN_SQL | ',' | vABS_ERGEBNIS_SQL | ',' | vGUTACHTERKOSTEN_SQL | ',' | vRISIKO_MT_NR_SQL | ',sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+ODBCClose( 'co1' );
+#endregion

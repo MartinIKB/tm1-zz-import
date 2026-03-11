@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_IFRS_SEGMENT_MUREX",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_IFRS_SEGMENT_MUREX')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_IFRS_SEGMENT_MUREX.views/Default.json"
+	]
+}

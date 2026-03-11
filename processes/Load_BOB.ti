@@ -1,0 +1,565 @@
+#region Prolog
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+#Löschen der Monatsscheibe aus CSV_BOB
+vMonatsscheibe_Delete=CellGetS( 'Import_BOB', 'MONATSSCHEIBE', 'Zeile_1' );
+ODBCOutput( 'co1','delete from CSV_BOB where MONATSSCHEIBE='''|vMonatsscheibe_Delete|'''');
+
+#Subsetbildung
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+
+    # Escape bestehender Apostrophe in KBEZ
+    vApostrophZeilenCount = 0;
+    vKBEZ = '';
+    vKBEZ = CellGetS('Import_BOB', 'KBEZ', vZeile);
+    vKBEZ_Escaped = '';
+    iChar = 1;
+    vLength = Long(vKBEZ);
+    vHasApostroph = 0;
+    While (iChar <= vLength);
+        vCurrentChar = SubSt(vKBEZ, iChar, 1);
+
+        If (vCurrentChar @= '''');
+            # Apostroph escapen
+            vKBEZ_Escaped = vKBEZ_Escaped | '''''';
+
+            # Merker setzen
+            vHasApostroph = 1;
+        Else;
+            vKBEZ_Escaped = vKBEZ_Escaped | vCurrentChar;
+        EndIf;
+        iChar = iChar + 1;
+    End;
+    If (vHasApostroph = 1);
+        vApostrophZeilenCount = vApostrophZeilenCount + 1;
+    EndIf;
+
+    #Auslesen der Cubewerte mit CellGetS
+    vVVS=CellGetS( 'Import_BOB', 'VVS', vZeile );
+    vKD_NR=CellGetS( 'Import_BOB', 'KD_NR', vZeile );
+    vLFD_NR=CellGetS( 'Import_BOB', 'LFD_NR', vZeile );
+    vTRANCHE=CellGetS( 'Import_BOB', 'TRANCHE', vZeile );
+    vUB_NR=CellGetS( 'Import_BOB', 'UB_NR', vZeile );
+    vUB_TYP=CellGetS( 'Import_BOB', 'UB_TYP', vZeile );
+    vTYP=CellGetS( 'Import_BOB', 'TYP', vZeile );
+    vBONITAET=CellGetS( 'Import_BOB', 'BONITAET', vZeile );
+    vSI_BO=CellGetS( 'Import_BOB', 'SI_BO', vZeile );
+    vLE_TIL_DAT=CellGetS( 'Import_BOB', 'LE_TIL_DAT', vZeile );
+    vFEST_VAR=CellGetS( 'Import_BOB', 'FEST_VAR', vZeile );
+    vAVS12=CellGetS( 'Import_BOB', 'AVS12', vZeile );
+    vRZ_KEZ=CellGetS( 'Import_BOB', 'RZ_KEZ', vZeile );
+    vNEU_KEZ=CellGetS( 'Import_BOB', 'NEU_KEZ', vZeile );
+    vSPARTE=CellGetS( 'Import_BOB', 'SPARTE', vZeile );
+    vKREDITVOLUMEN=CellGetS( 'Import_BOB', 'KREDITVOLUMEN', vZeile );
+    vHILFS_KREDITVOLUMEN_A=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_A', vZeile );
+    vHILFS_KREDITVOLUMEN_B=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_B', vZeile );
+    vHILFS_KREDITVOLUMEN_C=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_C', vZeile );
+    vHILFS_KREDITVOLUMEN_D=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_D', vZeile );
+    vKUNDENMARGE=CellGetS( 'Import_BOB', 'KUNDENMARGE', vZeile );
+    vKST_MRG_AKTUELL_FUNDING=CellGetS( 'Import_BOB', 'KST_MRG_AKTUELL_FUNDING', vZeile );
+    vKST_MRG_RISIKO=CellGetS( 'Import_BOB', 'KST_MRG_RISIKO', vZeile );
+    vKST_MRG_EK=CellGetS( 'Import_BOB', 'KST_MRG_EK', vZeile );
+    vKST_MRG_VERW_KOSTEN=CellGetS( 'Import_BOB', 'KST_MRG_VERW_KOSTEN', vZeile );
+    vKST_MRG_GESAMT=CellGetS( 'Import_BOB', 'KST_MRG_GESAMT', vZeile );
+    vDELTA_MARGE=CellGetS( 'Import_BOB', 'DELTA_MARGE', vZeile );
+    vBESTANDSWERT_OHNE_FZE=CellGetS( 'Import_BOB', 'BESTANDSWERT_OHNE_FZE', vZeile );
+    vZU_ABSCHLAG_OHNE_FZE=CellGetS( 'Import_BOB', 'ZU_ABSCHLAG_OHNE_FZE', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_A=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_A', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_B=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_B', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_C=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_C', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_D=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_D', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_E=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_E', vZeile );
+    vFZE=CellGetS( 'Import_BOB', 'FZE', vZeile );
+    vHILFS_FZE_A=CellGetS( 'Import_BOB', 'HILFS_FZE_A', vZeile );
+    vHILFS_FZE_B=CellGetS( 'Import_BOB', 'HILFS_FZE_B', vZeile );
+    vHILFS_FZE_C=CellGetS( 'Import_BOB', 'HILFS_FZE_C', vZeile );
+    vHILFS_FZE_D=CellGetS( 'Import_BOB', 'HILFS_FZE_D', vZeile );
+    vBESTANDSWERT_MIT_FZE=CellGetS( 'Import_BOB', 'BESTANDSWERT_MIT_FZE', vZeile );
+    vBEST_FZE_KREDIT=CellGetS( 'Import_BOB', 'BEST_FZE_KREDIT', vZeile );
+    vBEST_FZE_KUNDE=CellGetS( 'Import_BOB', 'BEST_FZE_KUNDE', vZeile );
+    vPREISINIDIKATION_ZEILE=CellGetS( 'Import_BOB', 'PREISINIDIKATION_ZEILE', vZeile );
+    vPREISINIDIKATION_KREDIT=CellGetS( 'Import_BOB', 'PREISINIDIKATION_KREDIT', vZeile );
+    vPREISINIDKATION_KUNDE=CellGetS( 'Import_BOB', 'PREISINIDKATION_KUNDE', vZeile );
+    vKD_DERIVAT=CellGetS( 'Import_BOB', 'KD_DERIVAT', vZeile );
+    vLIQUI_PROGRAMM_NAME=CellGetS( 'Import_BOB', 'LIQUI_PROGRAMM_NAME', vZeile );
+    vLIQUI_PROGRAMM_VOL=CellGetS( 'Import_BOB', 'LIQUI_PROGRAMM_VOL', vZeile );
+    vCLO_PROGRAMM_NAME=CellGetS( 'Import_BOB', 'CLO_PROGRAMM_NAME', vZeile );
+    vCLO_PROGRAMM_VOL=CellGetS( 'Import_BOB', 'CLO_PROGRAMM_VOL', vZeile );
+    vRWA_VOL=CellGetS( 'Import_BOB', 'RWA_VOL', vZeile );
+    vTRIGGER_REST_LFZ_2J=CellGetS( 'Import_BOB', 'TRIGGER_REST_LFZ_2J', vZeile );
+    vTRIGGER_BONI_8_SIBO50=CellGetS( 'Import_BOB', 'TRIGGER_BONI_8_SIBO50', vZeile );
+    vTRIGGER_ABSCHLAG_KD_50=CellGetS( 'Import_BOB', 'TRIGGER_ABSCHLAG_KD_50', vZeile );
+    vSALDO_OHNE_HAFT_UB=CellGetS( 'Import_BOB', 'SALDO_OHNE_HAFT_UB', vZeile );
+    vMONATSSCHEIBE=CellGetS( 'Import_BOB', 'MONATSSCHEIBE', vZeile );
+    vKD_MARGE_AKT=CellGetS( 'Import_BOB', 'KD_MARGE_AKT', vZeile );
+    vFUNDING_AKT=CellGetS( 'Import_BOB', 'FUNDING_AKT', vZeile );
+    vZINSMARGE_AKT=CellGetS( 'Import_BOB', 'ZINSMARGE_AKT', vZeile );
+    vBUCHUNGSKREIS=CellGetS( 'Import_BOB', 'BUCHUNGSKREIS', vZeile );
+    vGEBUNDENES_KAPITAL=CellGetS( 'Import_BOB', 'GEBUNDENES_KAPITAL', vZeile );
+    vRISIKOKOSTEN=CellGetS( 'Import_BOB', 'RISIKOKOSTEN', vZeile );
+    vEK_KOSTEN=CellGetS( 'Import_BOB', 'EK_KOSTEN', vZeile );
+    vFUNDINGKOSTEN=CellGetS( 'Import_BOB', 'FUNDINGKOSTEN', vZeile );
+    vZINSUEBERSCHUSS=CellGetS( 'Import_BOB', 'ZINSUEBERSCHUSS', vZeile );
+    vSSD_FIX=CellGetS( 'Import_BOB', 'SSD_FIX', vZeile );
+    vLIQUI_VOL_KEZ=CellGetS( 'Import_BOB', 'LIQUI_VOL_KEZ', vZeile );
+    vNOMINALZINS=CellGetS( 'Import_BOB', 'NOMINALZINS', vZeile );
+    vPVS=CellGetS( 'Import_BOB', 'PVS', vZeile );
+    vBPM_KEZ=CellGetS( 'Import_BOB', 'BPM_KEZ', vZeile );
+    vVERTRAGSVERWENDUNG=CellGetS( 'Import_BOB', 'VERTRAGSVERWENDUNG', vZeile );
+    vBOB_FUNDINGKURVE=CellGetS( 'Import_BOB', 'BOB_FUNDINGKURVE', vZeile );
+    vMRLZ=CellGetS( 'Import_BOB', 'MRLZ', vZeile );
+    vFAIR_VALUE=CellGetS( 'Import_BOB', 'FAIR_VALUE', vZeile );
+    vZINS_MARGE=CellGetS( 'Import_BOB', 'ZINS_MARGE', vZeile );
+    vFLOOR_WB_MARGE=CellGetS( 'Import_BOB', 'FLOOR_WB_MARGE', vZeile );
+    vFLOOR_VEREINBARUNG=CellGetS( 'Import_BOB', 'FLOOR_VEREINBARUNG', vZeile );
+    vKD_SEGMENT=CellGetS( 'Import_BOB', 'KD_SEGMENT', vZeile );
+    vASSETKLASSE=CellGetS( 'Import_BOB', 'ASSETKLASSE', vZeile );
+    vFLOOR_WB=CellGetS( 'Import_BOB', 'FLOOR_WB', vZeile );
+    vGFF=CellGetS( 'Import_BOB', 'GFF', vZeile );
+    vLEASING=CellGetS( 'Import_BOB', 'LEASING', vZeile );
+    vFORFAITIERUNG=CellGetS( 'Import_BOB', 'FORFAITIERUNG', vZeile );
+    vREVOLVER=CellGetS( 'Import_BOB', 'REVOLVER', vZeile );
+    vZUSAGE_DAT_KREDA=CellGetS( 'Import_BOB', 'ZUSAGE_DAT_KREDA', vZeile );
+    vPROL_DAT_KREDA=CellGetS( 'Import_BOB', 'PROL_DAT_KREDA', vZeile );
+    vLE_TIL_DAT_KREDA=CellGetS( 'Import_BOB', 'LE_TIL_DAT_KREDA', vZeile );
+    vCRM_PROJEKT_NUMMER=CellGetS( 'Import_BOB', 'CRM_PROJEKT_NUMMER', vZeile );
+   
+
+    if (long(vLE_TIL_DAT)=5);
+        vLE_TIL_DAT_Excel=NUMBR( vLE_TIL_DAT );
+        vLE_TIL_DAT=FormatDate( vLE_TIL_DAT_Excel, 'dd.MM.yyyy' );
+        CellPutS( vLE_TIL_DAT, 'Import_BOB', 'LE_TIL_DAT', vZeile );
+    endif;
+    if (long(vZUSAGE_DAT_KREDA)=5);
+        vZUSAGE_DAT_KREDA_Excel=NUMBR( vZUSAGE_DAT_KREDA );
+        vZUSAGE_DAT_KREDA=FormatDate( vZUSAGE_DAT_KREDA_Excel, 'dd.MM.yyyy' );
+        CellPutS( vZUSAGE_DAT_KREDA, 'Import_BOB', 'ZUSAGE_DAT_KREDA', vZeile );
+    endif;
+    if (long(vPROL_DAT_KREDA)=5);
+        vPROL_DAT_KREDA_Excel=NUMBR( vPROL_DAT_KREDA );
+        vPROL_DAT_KREDA=FormatDate( vPROL_DAT_KREDA_Excel, 'dd.MM.yyyy' );
+        CellPutS( vPROL_DAT_KREDA, 'Import_BOB', 'PROL_DAT_KREDA', vZeile );
+    endif;
+    if (long(vLE_TIL_DAT_KREDA)=5);
+        vLE_TIL_DAT_KREDA_Excel=NUMBR( vLE_TIL_DAT_KREDA );
+        vLE_TIL_DAT_KREDA=FormatDate( vLE_TIL_DAT_KREDA_Excel, 'dd.MM.yyyy' );
+        CellPutS( vLE_TIL_DAT_KREDA, 'Import_BOB', 'LE_TIL_DAT_KREDA', vZeile );
+    endif;
+
+
+    #Bildung des Insert SQLs
+    if (vKBEZ@<>'' % vMONATSSCHEIBE@<>'');
+                
+        #Prüfung, ob Tranche und UB_NR leer und ggf. durch 0 ersetzen
+        if (vTRANCHE @='');
+            vtranche='0';
+            CellPutS( vTRANCHE, 'Import_BOB', 'TRANCHE', vZeile );
+        endif;
+        if (vUB_NR @='');
+            vUB_NR='0';
+            CellPutS( vUB_NR, 'Import_BOB', 'UB_NR', vZeile );
+        endif; 
+
+        # Vorbereitung der Variablen für SQL Insert
+        vSQL1='insert into CSV_BOB values(';
+        vSQL2=''''|vKBEZ_Escaped|''''|',';  
+        vSQL3=IF (vVVS @= '', 'NULL', 'REPLACE('''|vVVS|''', '','', ''.'')') | ',';
+        vSQL4=IF (vKD_NR @= '', 'NULL', 'REPLACE('''|vKD_NR|''', '','', ''.'')') | ',';
+        vSQL5=IF (vLFD_NR @= '', 'NULL', 'REPLACE('''|vLFD_NR|''', '','', ''.'')') | ',';
+        vSQL6=IF (vTRANCHE @= '', 'NULL', 'REPLACE('''|vTRANCHE|''', '','', ''.'')') | ',';
+        vSQL7=IF (vUB_NR @= '', 'NULL', 'REPLACE('''|vUB_NR|''', '','', ''.'')') | ',';
+        vSQL8=IF (vUB_TYP @= '', 'NULL', 'REPLACE('''|vUB_TYP|''', '','', ''.'')') | ',';
+        vSQL9=IF (vTYP @= '', 'NULL', ''''|vTYP|'''') | ',';
+        vSQL10=IF (vBONITAET @= '', 'NULL', 'REPLACE('''|vBONITAET|''', '','', ''.'')') | ',';
+        vSQL11=IF (vSI_BO @= '', 'NULL', 'REPLACE('''|vSI_BO|''', '','', ''.'')') | ',';
+        vSQL12=IF (vLE_TIL_DAT@='', 'NULL,', 'TO_DATE('''|vLE_TIL_DAT|''', ''DD.MM.YYYY''),');
+        vSQL13=IF (vFEST_VAR @= '', 'NULL', ''''|vFEST_VAR|'''') | ',';
+        vSQL14=IF (vAVS12 @= '', 'NULL', ''''|vAVS12|'''') | ',';
+        vSQL15=IF (vRZ_KEZ @= '', 'NULL', ''''|vRZ_KEZ|'''') | ',';
+        vSQL16=IF (vNEU_KEZ @= '', 'NULL', ''''|vNEU_KEZ|'''') | ',';
+        vSQL17=IF (vSPARTE @= '', 'NULL', ''''|vSPARTE|'''') | ',';
+        vSQL18=IF (vKREDITVOLUMEN @= '', 'NULL', 'REPLACE('''|vKREDITVOLUMEN|''', '','', ''.'')') | ',';
+        vSQL19=IF (vHILFS_KREDITVOLUMEN_A @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_A|''', '','', ''.'')') | ',';
+        vSQL20=IF (vHILFS_KREDITVOLUMEN_B @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_B|''', '','', ''.'')') | ',';
+        vSQL21=IF (vHILFS_KREDITVOLUMEN_C @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_C|''', '','', ''.'')') | ',';
+        vSQL22=IF (vHILFS_KREDITVOLUMEN_D @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_D|''', '','', ''.'')') | ',';
+        vSQL23=IF (vKUNDENMARGE @= '', 'NULL', 'REPLACE('''|vKUNDENMARGE|''', '','', ''.'')') | ',';
+        vSQL24=IF (vKST_MRG_AKTUELL_FUNDING @= '', 'NULL', 'REPLACE('''|vKST_MRG_AKTUELL_FUNDING|''', '','', ''.'')') | ',';
+        vSQL25=IF (vKST_MRG_RISIKO @= '', 'NULL', 'REPLACE('''|vKST_MRG_RISIKO|''', '','', ''.'')') | ',';
+        vSQL26=IF (vKST_MRG_EK @= '', 'NULL', 'REPLACE('''|vKST_MRG_EK|''', '','', ''.'')') | ',';
+        vSQL27=IF (vKST_MRG_VERW_KOSTEN @= '', 'NULL', 'REPLACE('''|vKST_MRG_VERW_KOSTEN|''', '','', ''.'')') | ',';
+        vSQL28=IF (vKST_MRG_GESAMT @= '', 'NULL', 'REPLACE('''|vKST_MRG_GESAMT|''', '','', ''.'')') | ',';
+        vSQL29=IF (vDELTA_MARGE @= '', 'NULL', 'REPLACE('''|vDELTA_MARGE|''', '','', ''.'')') | ',';
+        vSQL30=IF (vBESTANDSWERT_OHNE_FZE @= '', 'NULL', 'REPLACE('''|vBESTANDSWERT_OHNE_FZE|''', '','', ''.'')') | ',';
+        vSQL31=IF (vZU_ABSCHLAG_OHNE_FZE @= '', 'NULL', 'REPLACE('''|vZU_ABSCHLAG_OHNE_FZE|''', '','', ''.'')') | ',';
+        vSQL32=IF (vHILFS_ZU_AB_OHNE_FZE_A @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_A|''', '','', ''.'')') | ',';
+        vSQL33=IF (vHILFS_ZU_AB_OHNE_FZE_B @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_B|''', '','', ''.'')') | ',';
+        vSQL34=IF (vHILFS_ZU_AB_OHNE_FZE_C @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_C|''', '','', ''.'')') | ',';
+        vSQL35=IF (vHILFS_ZU_AB_OHNE_FZE_D @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_D|''', '','', ''.'')') | ',';
+        vSQL36=IF (vHILFS_ZU_AB_OHNE_FZE_E @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_E|''', '','', ''.'')') | ',';
+        vSQL37=IF (vFZE @= '', 'NULL', 'REPLACE('''|vFZE|''', '','', ''.'')') | ',';
+        vSQL38=IF (vHILFS_FZE_A @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_A|''', '','', ''.'')') | ',';
+        vSQL39=IF (vHILFS_FZE_B @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_B|''', '','', ''.'')') | ',';
+        vSQL40=IF (vHILFS_FZE_C @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_C|''', '','', ''.'')') | ',';
+        vSQL41=IF (vHILFS_FZE_D @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_D|''', '','', ''.'')') | ',';
+        vSQL42=IF (vBESTANDSWERT_MIT_FZE @= '', 'NULL', 'REPLACE('''|vBESTANDSWERT_MIT_FZE|''', '','', ''.'')') | ',';
+        vSQL43=IF (vBEST_FZE_KREDIT @= '', 'NULL', 'REPLACE('''|vBEST_FZE_KREDIT|''', '','', ''.'')') | ',';
+        vSQL44=IF (vBEST_FZE_KUNDE @= '', 'NULL', 'REPLACE('''|vBEST_FZE_KUNDE|''', '','', ''.'')') | ',';
+        vSQL45=IF (vPREISINIDIKATION_ZEILE @= '', 'NULL', 'REPLACE('''|vPREISINIDIKATION_ZEILE|''', '','', ''.'')') | ',';
+        vSQL46=IF (vPREISINIDIKATION_KREDIT @= '', 'NULL', 'REPLACE('''|vPREISINIDIKATION_KREDIT|''', '','', ''.'')') | ',';
+        vSQL47=IF (vPREISINIDKATION_KUNDE @= '', 'NULL', 'REPLACE('''|vPREISINIDKATION_KUNDE|''', '','', ''.'')') | ',';
+        vSQL48=IF (vKD_DERIVAT @= '', 'NULL', ''''|vKD_DERIVAT|'''') | ',';
+        vSQL49=IF (vLIQUI_PROGRAMM_NAME @= '', 'NULL', ''''|vLIQUI_PROGRAMM_NAME|'''') | ',';
+        vSQL50=IF (vLIQUI_PROGRAMM_VOL @= '', 'NULL', 'REPLACE('''|vLIQUI_PROGRAMM_VOL|''', '','', ''.'')') | ',';
+        vSQL51=IF (vCLO_PROGRAMM_NAME @= '', 'NULL', ''''|vCLO_PROGRAMM_NAME|'''') | ',';
+        vSQL52=IF (vCLO_PROGRAMM_VOL @= '', 'NULL', 'REPLACE('''|vCLO_PROGRAMM_VOL|''', '','', ''.'')') | ',';
+        vSQL53=IF (vRWA_VOL @= '', 'NULL', 'REPLACE('''|vRWA_VOL|''', '','', ''.'')') | ',';
+        vSQL54=IF (vTRIGGER_REST_LFZ_2J @= '', 'NULL', ''''|vTRIGGER_REST_LFZ_2J|'''') | ',';
+        vSQL55=IF (vTRIGGER_BONI_8_SIBO50 @= '', 'NULL', ''''|vTRIGGER_BONI_8_SIBO50|'''') | ',';
+        vSQL56=IF (vTRIGGER_ABSCHLAG_KD_50 @= '', 'NULL', ''''|vTRIGGER_ABSCHLAG_KD_50|'''') | ',';
+        vSQL57=IF (vSALDO_OHNE_HAFT_UB @= '', 'NULL', 'REPLACE('''|vSALDO_OHNE_HAFT_UB|''', '','', ''.'')') | ',';
+        vSQL58=''''|vMONATSSCHEIBE|''''|',';
+        vSQL59=IF (vKD_MARGE_AKT @= '', 'NULL', 'REPLACE('''|vKD_MARGE_AKT|''', '','', ''.'')') | ',';
+        vSQL60=IF (vFUNDING_AKT @= '', 'NULL', 'REPLACE('''|vFUNDING_AKT|''', '','', ''.'')') | ',';
+        vSQL61=IF (vZINSMARGE_AKT @= '', 'NULL', 'REPLACE('''|vZINSMARGE_AKT|''', '','', ''.'')') | ',';
+        vSQL62=IF (vBUCHUNGSKREIS @= '', 'NULL', ''''|vBUCHUNGSKREIS|'''') | ',';
+        vSQL63=IF (vGEBUNDENES_KAPITAL @= '', 'NULL', 'REPLACE('''|vGEBUNDENES_KAPITAL|''', '','', ''.'')') | ',';
+        vSQL64=IF (vRISIKOKOSTEN @= '', 'NULL', 'REPLACE('''|vRISIKOKOSTEN|''', '','', ''.'')') | ',';
+        vSQL65=IF (vEK_KOSTEN @= '', 'NULL', 'REPLACE('''|vEK_KOSTEN|''', '','', ''.'')') | ',';
+        vSQL66=IF (vFUNDINGKOSTEN @= '', 'NULL', 'REPLACE('''|vFUNDINGKOSTEN|''', '','', ''.'')') | ',';
+        vSQL67=IF (vZINSUEBERSCHUSS @= '', 'NULL', 'REPLACE('''|vZINSUEBERSCHUSS|''', '','', ''.'')') | ',';
+        vSQL68=IF (vSSD_FIX @= '', 'NULL', ''''|vSSD_FIX|'''') | ',';
+        vSQL69=IF (vLIQUI_VOL_KEZ @= '', 'NULL', ''''|vLIQUI_VOL_KEZ|'''') | ',';
+        vSQL70=IF (vNOMINALZINS @= '', 'NULL', 'REPLACE('''|vNOMINALZINS|''', '','', ''.'')') | ',';
+        vSQL71=IF (vPVS @= '', 'NULL', 'REPLACE('''|vPVS|''', '','', ''.'')') | ',';
+        vSQL72=IF (vBPM_KEZ @= '', 'NULL', ''''|vBPM_KEZ|'''') | ',';
+        vSQL73=IF (vVERTRAGSVERWENDUNG @= '', 'NULL', 'REPLACE('''|vVERTRAGSVERWENDUNG|''', '','', ''.'')') | ',';
+        vSQL74=IF (vBOB_FUNDINGKURVE @= '', 'NULL', ''''|vBOB_FUNDINGKURVE|'''') | ',';
+        vSQL75=IF (vMRLZ @= '', 'NULL', 'REPLACE('''|vMRLZ|''', '','', ''.'')') | ',';
+        vSQL76=IF (vFAIR_VALUE @= '', 'NULL', 'REPLACE('''|vFAIR_VALUE|''', '','', ''.'')') | ',';
+        vSQL77=IF (vZINS_MARGE @= '', 'NULL', 'REPLACE('''|vZINS_MARGE|''', '','', ''.'')') | ',';
+        vSQL78=IF (vFLOOR_WB_MARGE @= '', 'NULL', 'REPLACE('''|vFLOOR_WB_MARGE|''', '','', ''.'')') | ',';
+        vSQL79=IF (vFLOOR_VEREINBARUNG @= '', 'NULL', 'REPLACE('''|vFLOOR_VEREINBARUNG|''', '','', ''.'')') | ',';
+        vSQL80=IF (vKD_SEGMENT @= '', 'NULL', ''''|vKD_SEGMENT|'''') | ',';
+        vSQL81=IF (vASSETKLASSE @= '', 'NULL', ''''|vASSETKLASSE|'''') | ',';
+        vSQL82=IF (vFLOOR_WB @= '', 'NULL', 'REPLACE('''|vFLOOR_WB|''', '','', ''.'')') | ',';
+        vSQL83=IF (vGFF @= '', 'NULL', ''''|vGFF|'''') | ',';
+        vSQL84=IF (vLEASING @= '', 'NULL', ''''|vLEASING|'''') | ',';
+        vSQL85=IF (vFORFAITIERUNG @= '', 'NULL', ''''|vFORFAITIERUNG|'''') | ',';
+        vSQL86=IF (vREVOLVER @= '', 'NULL', ''''|vREVOLVER|'''') | ',';
+        vSQL87=IF (vZUSAGE_DAT_KREDA@='', 'NULL,', 'TO_DATE('''|vZUSAGE_DAT_KREDA|''', ''DD.MM.YYYY''),');
+        vSQL88=IF (vPROL_DAT_KREDA@='', 'NULL,', 'TO_DATE('''|vPROL_DAT_KREDA|''', ''DD.MM.YYYY''),');
+        vSQL89=IF (vLE_TIL_DAT_KREDA@='', 'NULL,', 'TO_DATE('''|vLE_TIL_DAT_KREDA|''', ''DD.MM.YYYY''),');
+        vSQL90=IF (vCRM_PROJEKT_NUMMER @= '', 'NULL', ''''|vCRM_PROJEKT_NUMMER|'''') | ',';
+        vSQL91='NULL,NULL,NULL,NULL,NULL,NULL,NULL,sysdate)';
+
+        vSQL=vSQL1|vSQL2|vSQL3|vSQL4|vSQL5|vSQL6|vSQL7|vSQL8|vSQL9|vSQL10|vSQL11|vSQL12|vSQL13|vSQL14|vSQL15|vSQL16|vSQL17|vSQL18|vSQL19|vSQL20|vSQL21|vSQL22|vSQL23|vSQL24|vSQL25|vSQL26|vSQL27|vSQL28|vSQL29|vSQL30|vSQL31|vSQL32|vSQL33|vSQL34|vSQL35|vSQL36|vSQL37|vSQL38|vSQL39|vSQL40|vSQL41|vSQL42|vSQL43|vSQL44|vSQL45|vSQL46|vSQL47|vSQL48|vSQL49|vSQL50|vSQL51|vSQL52|vSQL53|vSQL54|vSQL55|vSQL56|vSQL57|vSQL58|vSQL59|vSQL60|vSQL61|vSQL62|vSQL63|vSQL64|vSQL65|vSQL66|vSQL67|vSQL68|vSQL69|vSQL70|vSQL71|vSQL72|vSQL73|vSQL74|vSQL75|vSQL76|vSQL77|vSQL78|vSQL79|vSQL80|vSQL81|vSQL82|vSQL83|vSQL84|vSQL85|vSQL86|vSQL87|vSQL88|vSQL89|vSQL90|vSQL91;
+
+         ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+#SQL ausführen
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+#Löschen der Monatsscheibe aus CSV_BOB
+vMonatsscheibe_Delete=CellGetS( 'Import_BOB', 'MONATSSCHEIBE', 'Zeile_1' );
+ODBCOutput( 'co1','delete from CSV_BOB where MONATSSCHEIBE='''|vMonatsscheibe_Delete|'''');
+
+#Subsetbildung
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+
+    # Escape bestehender Apostrophe in KBEZ
+    vApostrophZeilenCount = 0;
+    vKBEZ = '';
+    vKBEZ = CellGetS('Import_BOB', 'KBEZ', vZeile);
+    vKBEZ_Escaped = '';
+    iChar = 1;
+    vLength = Long(vKBEZ);
+    vHasApostroph = 0;
+    While (iChar <= vLength);
+        vCurrentChar = SubSt(vKBEZ, iChar, 1);
+
+        If (vCurrentChar @= '''');
+            # Apostroph escapen
+            vKBEZ_Escaped = vKBEZ_Escaped | '''''';
+
+            # Merker setzen
+            vHasApostroph = 1;
+        Else;
+            vKBEZ_Escaped = vKBEZ_Escaped | vCurrentChar;
+        EndIf;
+        iChar = iChar + 1;
+    End;
+    If (vHasApostroph = 1);
+        vApostrophZeilenCount = vApostrophZeilenCount + 1;
+    EndIf;
+
+    #Auslesen der Cubewerte mit CellGetS
+    vVVS=CellGetS( 'Import_BOB', 'VVS', vZeile );
+    vKD_NR=CellGetS( 'Import_BOB', 'KD_NR', vZeile );
+    vLFD_NR=CellGetS( 'Import_BOB', 'LFD_NR', vZeile );
+    vTRANCHE=CellGetS( 'Import_BOB', 'TRANCHE', vZeile );
+    vUB_NR=CellGetS( 'Import_BOB', 'UB_NR', vZeile );
+    vUB_TYP=CellGetS( 'Import_BOB', 'UB_TYP', vZeile );
+    vTYP=CellGetS( 'Import_BOB', 'TYP', vZeile );
+    vBONITAET=CellGetS( 'Import_BOB', 'BONITAET', vZeile );
+    vSI_BO=CellGetS( 'Import_BOB', 'SI_BO', vZeile );
+    vLE_TIL_DAT=CellGetS( 'Import_BOB', 'LE_TIL_DAT', vZeile );
+    vFEST_VAR=CellGetS( 'Import_BOB', 'FEST_VAR', vZeile );
+    vAVS12=CellGetS( 'Import_BOB', 'AVS12', vZeile );
+    vRZ_KEZ=CellGetS( 'Import_BOB', 'RZ_KEZ', vZeile );
+    vNEU_KEZ=CellGetS( 'Import_BOB', 'NEU_KEZ', vZeile );
+    vSPARTE=CellGetS( 'Import_BOB', 'SPARTE', vZeile );
+    vKREDITVOLUMEN=CellGetS( 'Import_BOB', 'KREDITVOLUMEN', vZeile );
+    vHILFS_KREDITVOLUMEN_A=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_A', vZeile );
+    vHILFS_KREDITVOLUMEN_B=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_B', vZeile );
+    vHILFS_KREDITVOLUMEN_C=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_C', vZeile );
+    vHILFS_KREDITVOLUMEN_D=CellGetS( 'Import_BOB', 'HILFS_KREDITVOLUMEN_D', vZeile );
+    vKUNDENMARGE=CellGetS( 'Import_BOB', 'KUNDENMARGE', vZeile );
+    vKST_MRG_AKTUELL_FUNDING=CellGetS( 'Import_BOB', 'KST_MRG_AKTUELL_FUNDING', vZeile );
+    vKST_MRG_RISIKO=CellGetS( 'Import_BOB', 'KST_MRG_RISIKO', vZeile );
+    vKST_MRG_EK=CellGetS( 'Import_BOB', 'KST_MRG_EK', vZeile );
+    vKST_MRG_VERW_KOSTEN=CellGetS( 'Import_BOB', 'KST_MRG_VERW_KOSTEN', vZeile );
+    vKST_MRG_GESAMT=CellGetS( 'Import_BOB', 'KST_MRG_GESAMT', vZeile );
+    vDELTA_MARGE=CellGetS( 'Import_BOB', 'DELTA_MARGE', vZeile );
+    vBESTANDSWERT_OHNE_FZE=CellGetS( 'Import_BOB', 'BESTANDSWERT_OHNE_FZE', vZeile );
+    vZU_ABSCHLAG_OHNE_FZE=CellGetS( 'Import_BOB', 'ZU_ABSCHLAG_OHNE_FZE', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_A=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_A', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_B=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_B', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_C=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_C', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_D=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_D', vZeile );
+    vHILFS_ZU_AB_OHNE_FZE_E=CellGetS( 'Import_BOB', 'HILFS_ZU_AB_OHNE_FZE_E', vZeile );
+    vFZE=CellGetS( 'Import_BOB', 'FZE', vZeile );
+    vHILFS_FZE_A=CellGetS( 'Import_BOB', 'HILFS_FZE_A', vZeile );
+    vHILFS_FZE_B=CellGetS( 'Import_BOB', 'HILFS_FZE_B', vZeile );
+    vHILFS_FZE_C=CellGetS( 'Import_BOB', 'HILFS_FZE_C', vZeile );
+    vHILFS_FZE_D=CellGetS( 'Import_BOB', 'HILFS_FZE_D', vZeile );
+    vBESTANDSWERT_MIT_FZE=CellGetS( 'Import_BOB', 'BESTANDSWERT_MIT_FZE', vZeile );
+    vBEST_FZE_KREDIT=CellGetS( 'Import_BOB', 'BEST_FZE_KREDIT', vZeile );
+    vBEST_FZE_KUNDE=CellGetS( 'Import_BOB', 'BEST_FZE_KUNDE', vZeile );
+    vPREISINIDIKATION_ZEILE=CellGetS( 'Import_BOB', 'PREISINIDIKATION_ZEILE', vZeile );
+    vPREISINIDIKATION_KREDIT=CellGetS( 'Import_BOB', 'PREISINIDIKATION_KREDIT', vZeile );
+    vPREISINIDKATION_KUNDE=CellGetS( 'Import_BOB', 'PREISINIDKATION_KUNDE', vZeile );
+    vKD_DERIVAT=CellGetS( 'Import_BOB', 'KD_DERIVAT', vZeile );
+    vLIQUI_PROGRAMM_NAME=CellGetS( 'Import_BOB', 'LIQUI_PROGRAMM_NAME', vZeile );
+    vLIQUI_PROGRAMM_VOL=CellGetS( 'Import_BOB', 'LIQUI_PROGRAMM_VOL', vZeile );
+    vCLO_PROGRAMM_NAME=CellGetS( 'Import_BOB', 'CLO_PROGRAMM_NAME', vZeile );
+    vCLO_PROGRAMM_VOL=CellGetS( 'Import_BOB', 'CLO_PROGRAMM_VOL', vZeile );
+    vRWA_VOL=CellGetS( 'Import_BOB', 'RWA_VOL', vZeile );
+    vTRIGGER_REST_LFZ_2J=CellGetS( 'Import_BOB', 'TRIGGER_REST_LFZ_2J', vZeile );
+    vTRIGGER_BONI_8_SIBO50=CellGetS( 'Import_BOB', 'TRIGGER_BONI_8_SIBO50', vZeile );
+    vTRIGGER_ABSCHLAG_KD_50=CellGetS( 'Import_BOB', 'TRIGGER_ABSCHLAG_KD_50', vZeile );
+    vSALDO_OHNE_HAFT_UB=CellGetS( 'Import_BOB', 'SALDO_OHNE_HAFT_UB', vZeile );
+    vMONATSSCHEIBE=CellGetS( 'Import_BOB', 'MONATSSCHEIBE', vZeile );
+    vKD_MARGE_AKT=CellGetS( 'Import_BOB', 'KD_MARGE_AKT', vZeile );
+    vFUNDING_AKT=CellGetS( 'Import_BOB', 'FUNDING_AKT', vZeile );
+    vZINSMARGE_AKT=CellGetS( 'Import_BOB', 'ZINSMARGE_AKT', vZeile );
+    vBUCHUNGSKREIS=CellGetS( 'Import_BOB', 'BUCHUNGSKREIS', vZeile );
+    vGEBUNDENES_KAPITAL=CellGetS( 'Import_BOB', 'GEBUNDENES_KAPITAL', vZeile );
+    vRISIKOKOSTEN=CellGetS( 'Import_BOB', 'RISIKOKOSTEN', vZeile );
+    vEK_KOSTEN=CellGetS( 'Import_BOB', 'EK_KOSTEN', vZeile );
+    vFUNDINGKOSTEN=CellGetS( 'Import_BOB', 'FUNDINGKOSTEN', vZeile );
+    vZINSUEBERSCHUSS=CellGetS( 'Import_BOB', 'ZINSUEBERSCHUSS', vZeile );
+    vSSD_FIX=CellGetS( 'Import_BOB', 'SSD_FIX', vZeile );
+    vLIQUI_VOL_KEZ=CellGetS( 'Import_BOB', 'LIQUI_VOL_KEZ', vZeile );
+    vNOMINALZINS=CellGetS( 'Import_BOB', 'NOMINALZINS', vZeile );
+    vPVS=CellGetS( 'Import_BOB', 'PVS', vZeile );
+    vBPM_KEZ=CellGetS( 'Import_BOB', 'BPM_KEZ', vZeile );
+    vVERTRAGSVERWENDUNG=CellGetS( 'Import_BOB', 'VERTRAGSVERWENDUNG', vZeile );
+    vBOB_FUNDINGKURVE=CellGetS( 'Import_BOB', 'BOB_FUNDINGKURVE', vZeile );
+    vMRLZ=CellGetS( 'Import_BOB', 'MRLZ', vZeile );
+    vFAIR_VALUE=CellGetS( 'Import_BOB', 'FAIR_VALUE', vZeile );
+    vZINS_MARGE=CellGetS( 'Import_BOB', 'ZINS_MARGE', vZeile );
+    vFLOOR_WB_MARGE=CellGetS( 'Import_BOB', 'FLOOR_WB_MARGE', vZeile );
+    vFLOOR_VEREINBARUNG=CellGetS( 'Import_BOB', 'FLOOR_VEREINBARUNG', vZeile );
+    vKD_SEGMENT=CellGetS( 'Import_BOB', 'KD_SEGMENT', vZeile );
+    vASSETKLASSE=CellGetS( 'Import_BOB', 'ASSETKLASSE', vZeile );
+    vFLOOR_WB=CellGetS( 'Import_BOB', 'FLOOR_WB', vZeile );
+    vGFF=CellGetS( 'Import_BOB', 'GFF', vZeile );
+    vLEASING=CellGetS( 'Import_BOB', 'LEASING', vZeile );
+    vFORFAITIERUNG=CellGetS( 'Import_BOB', 'FORFAITIERUNG', vZeile );
+    vREVOLVER=CellGetS( 'Import_BOB', 'REVOLVER', vZeile );
+    vZUSAGE_DAT_KREDA=CellGetS( 'Import_BOB', 'ZUSAGE_DAT_KREDA', vZeile );
+    vPROL_DAT_KREDA=CellGetS( 'Import_BOB', 'PROL_DAT_KREDA', vZeile );
+    vLE_TIL_DAT_KREDA=CellGetS( 'Import_BOB', 'LE_TIL_DAT_KREDA', vZeile );
+    vCRM_PROJEKT_NUMMER=CellGetS( 'Import_BOB', 'CRM_PROJEKT_NUMMER', vZeile );
+   
+
+    if (long(vLE_TIL_DAT)=5);
+        vLE_TIL_DAT_Excel=NUMBR( vLE_TIL_DAT );
+        vLE_TIL_DAT=FormatDate( vLE_TIL_DAT_Excel, 'dd.MM.yyyy' );
+        CellPutS( vLE_TIL_DAT, 'Import_BOB', 'LE_TIL_DAT', vZeile );
+    endif;
+    if (long(vZUSAGE_DAT_KREDA)=5);
+        vZUSAGE_DAT_KREDA_Excel=NUMBR( vZUSAGE_DAT_KREDA );
+        vZUSAGE_DAT_KREDA=FormatDate( vZUSAGE_DAT_KREDA_Excel, 'dd.MM.yyyy' );
+        CellPutS( vZUSAGE_DAT_KREDA, 'Import_BOB', 'ZUSAGE_DAT_KREDA', vZeile );
+    endif;
+    if (long(vPROL_DAT_KREDA)=5);
+        vPROL_DAT_KREDA_Excel=NUMBR( vPROL_DAT_KREDA );
+        vPROL_DAT_KREDA=FormatDate( vPROL_DAT_KREDA_Excel, 'dd.MM.yyyy' );
+        CellPutS( vPROL_DAT_KREDA, 'Import_BOB', 'PROL_DAT_KREDA', vZeile );
+    endif;
+    if (long(vLE_TIL_DAT_KREDA)=5);
+        vLE_TIL_DAT_KREDA_Excel=NUMBR( vLE_TIL_DAT_KREDA );
+        vLE_TIL_DAT_KREDA=FormatDate( vLE_TIL_DAT_KREDA_Excel, 'dd.MM.yyyy' );
+        CellPutS( vLE_TIL_DAT_KREDA, 'Import_BOB', 'LE_TIL_DAT_KREDA', vZeile );
+    endif;
+
+
+    #Bildung des Insert SQLs
+    if (vKBEZ@<>'' % vMONATSSCHEIBE@<>'');
+                
+        #Prüfung, ob Tranche und UB_NR leer und ggf. durch 0 ersetzen
+        if (vTRANCHE @='');
+            vtranche='0';
+            CellPutS( vTRANCHE, 'Import_BOB', 'TRANCHE', vZeile );
+        endif;
+        if (vUB_NR @='');
+            vUB_NR='0';
+            CellPutS( vUB_NR, 'Import_BOB', 'UB_NR', vZeile );
+        endif; 
+
+        # Vorbereitung der Variablen für SQL Insert
+        vSQL1='insert into CSV_BOB values(';
+        vSQL2=''''|vKBEZ_Escaped|''''|',';  
+        vSQL3=IF (vVVS @= '', 'NULL', 'REPLACE('''|vVVS|''', '','', ''.'')') | ',';
+        vSQL4=IF (vKD_NR @= '', 'NULL', 'REPLACE('''|vKD_NR|''', '','', ''.'')') | ',';
+        vSQL5=IF (vLFD_NR @= '', 'NULL', 'REPLACE('''|vLFD_NR|''', '','', ''.'')') | ',';
+        vSQL6=IF (vTRANCHE @= '', 'NULL', 'REPLACE('''|vTRANCHE|''', '','', ''.'')') | ',';
+        vSQL7=IF (vUB_NR @= '', 'NULL', 'REPLACE('''|vUB_NR|''', '','', ''.'')') | ',';
+        vSQL8=IF (vUB_TYP @= '', 'NULL', 'REPLACE('''|vUB_TYP|''', '','', ''.'')') | ',';
+        vSQL9=IF (vTYP @= '', 'NULL', ''''|vTYP|'''') | ',';
+        vSQL10=IF (vBONITAET @= '', 'NULL', 'REPLACE('''|vBONITAET|''', '','', ''.'')') | ',';
+        vSQL11=IF (vSI_BO @= '', 'NULL', 'REPLACE('''|vSI_BO|''', '','', ''.'')') | ',';
+        vSQL12=IF (vLE_TIL_DAT@='', 'NULL,', 'TO_DATE('''|vLE_TIL_DAT|''', ''DD.MM.YYYY''),');
+        vSQL13=IF (vFEST_VAR @= '', 'NULL', ''''|vFEST_VAR|'''') | ',';
+        vSQL14=IF (vAVS12 @= '', 'NULL', ''''|vAVS12|'''') | ',';
+        vSQL15=IF (vRZ_KEZ @= '', 'NULL', ''''|vRZ_KEZ|'''') | ',';
+        vSQL16=IF (vNEU_KEZ @= '', 'NULL', ''''|vNEU_KEZ|'''') | ',';
+        vSQL17=IF (vSPARTE @= '', 'NULL', ''''|vSPARTE|'''') | ',';
+        vSQL18=IF (vKREDITVOLUMEN @= '', 'NULL', 'REPLACE('''|vKREDITVOLUMEN|''', '','', ''.'')') | ',';
+        vSQL19=IF (vHILFS_KREDITVOLUMEN_A @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_A|''', '','', ''.'')') | ',';
+        vSQL20=IF (vHILFS_KREDITVOLUMEN_B @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_B|''', '','', ''.'')') | ',';
+        vSQL21=IF (vHILFS_KREDITVOLUMEN_C @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_C|''', '','', ''.'')') | ',';
+        vSQL22=IF (vHILFS_KREDITVOLUMEN_D @= '', 'NULL', 'REPLACE('''|vHILFS_KREDITVOLUMEN_D|''', '','', ''.'')') | ',';
+        vSQL23=IF (vKUNDENMARGE @= '', 'NULL', 'REPLACE('''|vKUNDENMARGE|''', '','', ''.'')') | ',';
+        vSQL24=IF (vKST_MRG_AKTUELL_FUNDING @= '', 'NULL', 'REPLACE('''|vKST_MRG_AKTUELL_FUNDING|''', '','', ''.'')') | ',';
+        vSQL25=IF (vKST_MRG_RISIKO @= '', 'NULL', 'REPLACE('''|vKST_MRG_RISIKO|''', '','', ''.'')') | ',';
+        vSQL26=IF (vKST_MRG_EK @= '', 'NULL', 'REPLACE('''|vKST_MRG_EK|''', '','', ''.'')') | ',';
+        vSQL27=IF (vKST_MRG_VERW_KOSTEN @= '', 'NULL', 'REPLACE('''|vKST_MRG_VERW_KOSTEN|''', '','', ''.'')') | ',';
+        vSQL28=IF (vKST_MRG_GESAMT @= '', 'NULL', 'REPLACE('''|vKST_MRG_GESAMT|''', '','', ''.'')') | ',';
+        vSQL29=IF (vDELTA_MARGE @= '', 'NULL', 'REPLACE('''|vDELTA_MARGE|''', '','', ''.'')') | ',';
+        vSQL30=IF (vBESTANDSWERT_OHNE_FZE @= '', 'NULL', 'REPLACE('''|vBESTANDSWERT_OHNE_FZE|''', '','', ''.'')') | ',';
+        vSQL31=IF (vZU_ABSCHLAG_OHNE_FZE @= '', 'NULL', 'REPLACE('''|vZU_ABSCHLAG_OHNE_FZE|''', '','', ''.'')') | ',';
+        vSQL32=IF (vHILFS_ZU_AB_OHNE_FZE_A @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_A|''', '','', ''.'')') | ',';
+        vSQL33=IF (vHILFS_ZU_AB_OHNE_FZE_B @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_B|''', '','', ''.'')') | ',';
+        vSQL34=IF (vHILFS_ZU_AB_OHNE_FZE_C @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_C|''', '','', ''.'')') | ',';
+        vSQL35=IF (vHILFS_ZU_AB_OHNE_FZE_D @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_D|''', '','', ''.'')') | ',';
+        vSQL36=IF (vHILFS_ZU_AB_OHNE_FZE_E @= '', 'NULL', 'REPLACE('''|vHILFS_ZU_AB_OHNE_FZE_E|''', '','', ''.'')') | ',';
+        vSQL37=IF (vFZE @= '', 'NULL', 'REPLACE('''|vFZE|''', '','', ''.'')') | ',';
+        vSQL38=IF (vHILFS_FZE_A @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_A|''', '','', ''.'')') | ',';
+        vSQL39=IF (vHILFS_FZE_B @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_B|''', '','', ''.'')') | ',';
+        vSQL40=IF (vHILFS_FZE_C @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_C|''', '','', ''.'')') | ',';
+        vSQL41=IF (vHILFS_FZE_D @= '', 'NULL', 'REPLACE('''|vHILFS_FZE_D|''', '','', ''.'')') | ',';
+        vSQL42=IF (vBESTANDSWERT_MIT_FZE @= '', 'NULL', 'REPLACE('''|vBESTANDSWERT_MIT_FZE|''', '','', ''.'')') | ',';
+        vSQL43=IF (vBEST_FZE_KREDIT @= '', 'NULL', 'REPLACE('''|vBEST_FZE_KREDIT|''', '','', ''.'')') | ',';
+        vSQL44=IF (vBEST_FZE_KUNDE @= '', 'NULL', 'REPLACE('''|vBEST_FZE_KUNDE|''', '','', ''.'')') | ',';
+        vSQL45=IF (vPREISINIDIKATION_ZEILE @= '', 'NULL', 'REPLACE('''|vPREISINIDIKATION_ZEILE|''', '','', ''.'')') | ',';
+        vSQL46=IF (vPREISINIDIKATION_KREDIT @= '', 'NULL', 'REPLACE('''|vPREISINIDIKATION_KREDIT|''', '','', ''.'')') | ',';
+        vSQL47=IF (vPREISINIDKATION_KUNDE @= '', 'NULL', 'REPLACE('''|vPREISINIDKATION_KUNDE|''', '','', ''.'')') | ',';
+        vSQL48=IF (vKD_DERIVAT @= '', 'NULL', ''''|vKD_DERIVAT|'''') | ',';
+        vSQL49=IF (vLIQUI_PROGRAMM_NAME @= '', 'NULL', ''''|vLIQUI_PROGRAMM_NAME|'''') | ',';
+        vSQL50=IF (vLIQUI_PROGRAMM_VOL @= '', 'NULL', 'REPLACE('''|vLIQUI_PROGRAMM_VOL|''', '','', ''.'')') | ',';
+        vSQL51=IF (vCLO_PROGRAMM_NAME @= '', 'NULL', ''''|vCLO_PROGRAMM_NAME|'''') | ',';
+        vSQL52=IF (vCLO_PROGRAMM_VOL @= '', 'NULL', 'REPLACE('''|vCLO_PROGRAMM_VOL|''', '','', ''.'')') | ',';
+        vSQL53=IF (vRWA_VOL @= '', 'NULL', 'REPLACE('''|vRWA_VOL|''', '','', ''.'')') | ',';
+        vSQL54=IF (vTRIGGER_REST_LFZ_2J @= '', 'NULL', ''''|vTRIGGER_REST_LFZ_2J|'''') | ',';
+        vSQL55=IF (vTRIGGER_BONI_8_SIBO50 @= '', 'NULL', ''''|vTRIGGER_BONI_8_SIBO50|'''') | ',';
+        vSQL56=IF (vTRIGGER_ABSCHLAG_KD_50 @= '', 'NULL', ''''|vTRIGGER_ABSCHLAG_KD_50|'''') | ',';
+        vSQL57=IF (vSALDO_OHNE_HAFT_UB @= '', 'NULL', 'REPLACE('''|vSALDO_OHNE_HAFT_UB|''', '','', ''.'')') | ',';
+        vSQL58=''''|vMONATSSCHEIBE|''''|',';
+        vSQL59=IF (vKD_MARGE_AKT @= '', 'NULL', 'REPLACE('''|vKD_MARGE_AKT|''', '','', ''.'')') | ',';
+        vSQL60=IF (vFUNDING_AKT @= '', 'NULL', 'REPLACE('''|vFUNDING_AKT|''', '','', ''.'')') | ',';
+        vSQL61=IF (vZINSMARGE_AKT @= '', 'NULL', 'REPLACE('''|vZINSMARGE_AKT|''', '','', ''.'')') | ',';
+        vSQL62=IF (vBUCHUNGSKREIS @= '', 'NULL', ''''|vBUCHUNGSKREIS|'''') | ',';
+        vSQL63=IF (vGEBUNDENES_KAPITAL @= '', 'NULL', 'REPLACE('''|vGEBUNDENES_KAPITAL|''', '','', ''.'')') | ',';
+        vSQL64=IF (vRISIKOKOSTEN @= '', 'NULL', 'REPLACE('''|vRISIKOKOSTEN|''', '','', ''.'')') | ',';
+        vSQL65=IF (vEK_KOSTEN @= '', 'NULL', 'REPLACE('''|vEK_KOSTEN|''', '','', ''.'')') | ',';
+        vSQL66=IF (vFUNDINGKOSTEN @= '', 'NULL', 'REPLACE('''|vFUNDINGKOSTEN|''', '','', ''.'')') | ',';
+        vSQL67=IF (vZINSUEBERSCHUSS @= '', 'NULL', 'REPLACE('''|vZINSUEBERSCHUSS|''', '','', ''.'')') | ',';
+        vSQL68=IF (vSSD_FIX @= '', 'NULL', ''''|vSSD_FIX|'''') | ',';
+        vSQL69=IF (vLIQUI_VOL_KEZ @= '', 'NULL', ''''|vLIQUI_VOL_KEZ|'''') | ',';
+        vSQL70=IF (vNOMINALZINS @= '', 'NULL', 'REPLACE('''|vNOMINALZINS|''', '','', ''.'')') | ',';
+        vSQL71=IF (vPVS @= '', 'NULL', 'REPLACE('''|vPVS|''', '','', ''.'')') | ',';
+        vSQL72=IF (vBPM_KEZ @= '', 'NULL', ''''|vBPM_KEZ|'''') | ',';
+        vSQL73=IF (vVERTRAGSVERWENDUNG @= '', 'NULL', 'REPLACE('''|vVERTRAGSVERWENDUNG|''', '','', ''.'')') | ',';
+        vSQL74=IF (vBOB_FUNDINGKURVE @= '', 'NULL', ''''|vBOB_FUNDINGKURVE|'''') | ',';
+        vSQL75=IF (vMRLZ @= '', 'NULL', 'REPLACE('''|vMRLZ|''', '','', ''.'')') | ',';
+        vSQL76=IF (vFAIR_VALUE @= '', 'NULL', 'REPLACE('''|vFAIR_VALUE|''', '','', ''.'')') | ',';
+        vSQL77=IF (vZINS_MARGE @= '', 'NULL', 'REPLACE('''|vZINS_MARGE|''', '','', ''.'')') | ',';
+        vSQL78=IF (vFLOOR_WB_MARGE @= '', 'NULL', 'REPLACE('''|vFLOOR_WB_MARGE|''', '','', ''.'')') | ',';
+        vSQL79=IF (vFLOOR_VEREINBARUNG @= '', 'NULL', 'REPLACE('''|vFLOOR_VEREINBARUNG|''', '','', ''.'')') | ',';
+        vSQL80=IF (vKD_SEGMENT @= '', 'NULL', ''''|vKD_SEGMENT|'''') | ',';
+        vSQL81=IF (vASSETKLASSE @= '', 'NULL', ''''|vASSETKLASSE|'''') | ',';
+        vSQL82=IF (vFLOOR_WB @= '', 'NULL', 'REPLACE('''|vFLOOR_WB|''', '','', ''.'')') | ',';
+        vSQL83=IF (vGFF @= '', 'NULL', ''''|vGFF|'''') | ',';
+        vSQL84=IF (vLEASING @= '', 'NULL', ''''|vLEASING|'''') | ',';
+        vSQL85=IF (vFORFAITIERUNG @= '', 'NULL', ''''|vFORFAITIERUNG|'''') | ',';
+        vSQL86=IF (vREVOLVER @= '', 'NULL', ''''|vREVOLVER|'''') | ',';
+        vSQL87=IF (vZUSAGE_DAT_KREDA@='', 'NULL,', 'TO_DATE('''|vZUSAGE_DAT_KREDA|''', ''DD.MM.YYYY''),');
+        vSQL88=IF (vPROL_DAT_KREDA@='', 'NULL,', 'TO_DATE('''|vPROL_DAT_KREDA|''', ''DD.MM.YYYY''),');
+        vSQL89=IF (vLE_TIL_DAT_KREDA@='', 'NULL,', 'TO_DATE('''|vLE_TIL_DAT_KREDA|''', ''DD.MM.YYYY''),');
+        vSQL90=IF (vCRM_PROJEKT_NUMMER @= '', 'NULL', ''''|vCRM_PROJEKT_NUMMER|'''') | ',';
+        vSQL91='NULL,NULL,NULL,NULL,NULL,NULL,NULL,sysdate)';
+
+        vSQL=vSQL1|vSQL2|vSQL3|vSQL4|vSQL5|vSQL6|vSQL7|vSQL8|vSQL9|vSQL10|vSQL11|vSQL12|vSQL13|vSQL14|vSQL15|vSQL16|vSQL17|vSQL18|vSQL19|vSQL20|vSQL21|vSQL22|vSQL23|vSQL24|vSQL25|vSQL26|vSQL27|vSQL28|vSQL29|vSQL30|vSQL31|vSQL32|vSQL33|vSQL34|vSQL35|vSQL36|vSQL37|vSQL38|vSQL39|vSQL40|vSQL41|vSQL42|vSQL43|vSQL44|vSQL45|vSQL46|vSQL47|vSQL48|vSQL49|vSQL50|vSQL51|vSQL52|vSQL53|vSQL54|vSQL55|vSQL56|vSQL57|vSQL58|vSQL59|vSQL60|vSQL61|vSQL62|vSQL63|vSQL64|vSQL65|vSQL66|vSQL67|vSQL68|vSQL69|vSQL70|vSQL71|vSQL72|vSQL73|vSQL74|vSQL75|vSQL76|vSQL77|vSQL78|vSQL79|vSQL80|vSQL81|vSQL82|vSQL83|vSQL84|vSQL85|vSQL86|vSQL87|vSQL88|vSQL89|vSQL90|vSQL91;
+
+         ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+
+# Weiterverarbeitung IN CO1 starten.
+vSQL_1 = 'truncate table bob_parameter';
+vSQL_2 = 'insert into bob_parameter (select monatsscheibe from pv_parameter)';
+vSQL_3 = 'begin PK_DTL_BOB_ZEIT.Main;commit;end;';
+vSQL_4 = 'begin PK_STG_BOB_VERTRAG.Main;commit;end;';
+vSQL_5 = 'begin PK_DTL_BOB_VERTRAG.Main;commit;end;';
+
+ODBCOutput('co1', vSQL_1);
+ODBCOutput('co1', vSQL_2);
+ODBCOutput('co1', vSQL_3);
+ODBCOutput('co1', vSQL_4);
+ODBCOutput('co1', vSQL_5);
+
+ODBCClose( 'co1' );
+
+
+ODBCClose( 'co1' );
+#endregion

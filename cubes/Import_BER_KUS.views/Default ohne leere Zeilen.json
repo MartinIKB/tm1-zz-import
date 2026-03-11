@@ -1,0 +1,15 @@
+{
+	"@type":"MDXView",
+	"Name":"Default ohne leere Zeilen",
+	"MDX@Code.link":"Default ohne leere Zeilen.mdx",
+	"Meta" : 
+	{
+		"Aliases" : {},
+		"ContextSets" : {},
+		"ExpandAboves" : 
+		{
+			"[Spalten_BER_KUS].[Spalten_BER_KUS]" : false,
+			"[Zeilen].[Zeilen]" : false
+		}
+	}
+}

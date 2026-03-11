@@ -1,0 +1,15 @@
+{
+	"@type":"MDXView",
+	"Name":"Default",
+	"MDX@Code.link":"Default.mdx",
+	"Meta" : 
+	{
+		"Aliases" : {},
+		"ContextSets" : {},
+		"ExpandAboves" : 
+		{
+			"[Spalten_KST_MELDEDATEN].[Spalten_KST_MELDEDATEN]" : false,
+			"[Zeilen].[Zeilen]" : false
+		}
+	}
+}

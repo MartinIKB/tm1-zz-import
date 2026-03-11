@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_NVR_KUS",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_NVR_KUS')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_NVR_KUS.views/Default.json"
+	]
+}

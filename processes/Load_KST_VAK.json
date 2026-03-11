@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Load_KST_VAK",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Load_KST_VAK.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

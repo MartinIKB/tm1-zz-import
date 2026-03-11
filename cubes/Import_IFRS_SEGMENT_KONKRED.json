@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_IFRS_SEGMENT_KONKRED",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_IFRS_SEGMENT_KONKRED')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_IFRS_SEGMENT_KONKRED.views/Default.json"
+	]
+}

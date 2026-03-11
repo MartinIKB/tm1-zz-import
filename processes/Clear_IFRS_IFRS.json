@@ -1,0 +1,12 @@
+{
+	"@type":"Process",
+	"Name":"Clear_IFRS_IFRS",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_IFRS_IFRS.ti",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

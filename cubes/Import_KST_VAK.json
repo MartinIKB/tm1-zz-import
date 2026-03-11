@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_KST_VAK",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_KST_VAK')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_KST_VAK.views/Default.json"
+	]
+}

@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_BER_KD_MAN",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_BER_KD_MAN')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_BER_KD_MAN.views/Default.json"
+	]
+}

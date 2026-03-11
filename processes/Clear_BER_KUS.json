@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Clear_BER_KUS",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_BER_KUS.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

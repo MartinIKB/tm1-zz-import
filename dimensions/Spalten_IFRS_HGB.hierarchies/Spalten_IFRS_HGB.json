@@ -1,0 +1,16 @@
+{
+	"@type":"Hierarchy",
+	"Name":"Spalten_IFRS_HGB",
+	"Elements":
+	[
+		{
+			"Name":"SCHLUESSEL",
+			"Type":"String"
+		},
+		{
+			"Name":"HGB_TYP",
+			"Type":"String"
+		}
+	],
+	"Subsets@Code.links":[]
+}

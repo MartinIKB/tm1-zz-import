@@ -1,0 +1,59 @@
+#region Prolog
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+vMONATSSCHEIBE_Default=CellGetS( 'Import_KST_MELDEDATEN', 'Zeile_1', 'MONATSSCHEIBE' ); 
+
+LogOutput( 'INFO', 'Löschen der Monatsscheibe '|vMONATSSCHEIBE_Default| ' aus CSV_KST_MD_FINALTABELLE' );
+ODBCOutput( 'co1','delete from CSV_KST_MD_FINALTABELLE where MONATSSCHEIBE='''|vMONATSSCHEIBE_Default|'''');
+
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vMONATSSCHEIBE=CellGetS( 'Import_KST_MELDEDATEN', vZeile, 'MONATSSCHEIBE' );
+    vGESELLSCHAFT=CellGetS( 'Import_KST_MELDEDATEN', vZeile, 'GESELLSCHAFT' );
+    vGESBEZ=CellGetS( 'Import_KST_MELDEDATEN', vZeile, 'GESBEZ' );
+    vKOSTENART=CellGetS( 'Import_KST_MELDEDATEN', vZeile, 'KOSTENART' );
+    vKOABEZ=CellGetS( 'Import_KST_MELDEDATEN', vZeile, 'KOABEZ' );
+    vWERT=CellGetS( 'Import_KST_MELDEDATEN', vZeile, 'WERT' );
+    
+    vGESBEZ_Escaped = '';
+    #Löschen der Apostrophe aus GESBEZ
+    iChar = 1;
+    vLength = Long(vGESBEZ);
+    While (iChar <= vLength);
+        vCurrentChar = SubSt(vGESBEZ, iChar, 1);
+        If (vCurrentChar @= '''');
+            vGESBEZ_Escaped = vGESBEZ_Escaped | '''''';
+        Else;
+            vGESBEZ_Escaped = vGESBEZ_Escaped | vCurrentChar;
+        EndIf;
+        iChar = iChar + 1;
+    End;
+    
+    if (vMONATSSCHEIBE@<>'');
+        
+        if (vWERT@='');
+            vWert='0';
+            CellPutS( vWert,'Import_KST_MELDEDATEN', vZeile, 'WERT' );
+        endif;
+        
+        vMONATSSCHEIBE_SQL=IF (vMONATSSCHEIBE@='', 'NULL', ''''|vMONATSSCHEIBE|'''');
+        vGESELLSCHAFT_SQL=IF (vGESELLSCHAFT@='', 'NULL', ''''|vGESELLSCHAFT|'''');
+        vGESBEZ_SQL=IF (vGESBEZ@='', 'NULL', ''''|vGESBEZ_Escaped|'''');
+        vKOSTENART_SQL=IF (vKOSTENART@='', 'NULL', 'REPLACE('''|vKOSTENART|''', '','', ''.'')');
+        vKOABEZ_SQL=IF (vKOABEZ@='', 'NULL', ''''|vKOABEZ|'''');
+        vWERT_SQL=IF (vWERT@='', 'NULL', 'REPLACE('''|vWERT|''', '','', ''.'')');
+        vSQL='insert into CSV_KST_MD_FINALTABELLE values(' | vMONATSSCHEIBE_SQL | ',' | vGESELLSCHAFT_SQL | ',' | vGESBEZ_SQL | ',' | vKOSTENART_SQL | ',' | vKOABEZ_SQL | ',' | vWERT_SQL | ',sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+
+ODBCClose( 'co1' );
+#endregion

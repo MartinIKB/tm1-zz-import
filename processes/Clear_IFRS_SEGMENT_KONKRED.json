@@ -1,0 +1,12 @@
+{
+	"@type":"Process",
+	"Name":"Clear_IFRS_SEGMENT_KONKRED",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_IFRS_SEGMENT_KONKRED.ti",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

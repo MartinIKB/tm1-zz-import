@@ -1,0 +1,15 @@
+{
+	"@type":"MDXView",
+	"Name":"Default",
+	"MDX@Code.link":"Default.mdx",
+	"Meta" : 
+	{
+		"Aliases" : {},
+		"ContextSets" : {},
+		"ExpandAboves" : 
+		{
+			"[Spalten_BOB].[Spalten_BOB]" : false,
+			"[Zeilen].[Zeilen]" : false
+		}
+	}
+}

@@ -1,0 +1,27 @@
+#region Prolog
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+LogOutput( 'INFO', 'Löschen aller Daten aus STG_IFRS_MAPPING_HGB' );
+ODBCOutput( 'co1','truncate Table STG_IFRS_MAPPING_HGB');
+
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vSchluessel=CellGetS( 'Import_IFRS_HGB', 'SCHLUESSEL', vZeile );
+    vHGBTyp=CellGetS( 'Import_IFRS_HGB', 'HGB_TYP', vZeile );
+    if (vSchluessel@<>'');
+        vSQL='insert into STG_IFRS_MAPPING_HGB values('''|vSchluessel|''','''|vHGBTyp|''',sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+
+ODBCClose( 'co1' );
+#endregion

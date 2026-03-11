@@ -1,0 +1,54 @@
+#region Prolog
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+vStichtag_Default=CellGetS( 'Import_NVR_Kus', 'Stichtag', 'Zeile_1' );
+if (long(vSTICHTAG_Default)=5);
+    vSTICHTAG_Default_Excel=NUMBR( vSTICHTAG_Default );
+    vSTICHTAG_Default=FormatDate( vSTICHTAG_Default_Excel, 'dd.MM.yyyy' );
+endif;
+
+LogOutput( 'INFO', 'Löschen des Stichtags '|vStichtag_Default| ' aus csv_nvr_kosten' );
+ODBCOutput( 'co1','delete from csv_nvr_kosten where stichtag='''|vStichtag_Default|'''');
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vStichtag=CellGetS( 'Import_NVR_Kus', 'Stichtag', vZeile );
+    vEinheit=CellGetS( 'Import_NVR_Kus', 'Einheit', vZeile );
+    vKostenVertriebIG=CellGetS( 'Import_NVR_Kus', 'Kosten_Vertrieb_IG', vZeile );
+    vKostenProdukt=CellGetS( 'Import_NVR_Kus', 'Kosten_Produkt', vZeile );
+    vKostenMarktfolge=CellGetS( 'Import_NVR_Kus', 'Kosten_Marktfolge', vZeile );
+    vKosten4=CellGetS( 'Import_NVR_Kus', 'Kosten_4', vZeile );
+    vKosten5=CellGetS( 'Import_NVR_Kus', 'Kosten_5', vZeile );
+    vKostenVertrieb=CellGetS( 'Import_NVR_Kus', 'Kosten_Vertrieb', vZeile );
+
+    if (long(vSTICHTAG)=5);
+        vSTICHTAG_Excel=NUMBR( vSTICHTAG );
+        vSTICHTAG=FormatDate( vSTICHTAG_Excel, 'dd.MM.yyyy' );
+        CellPutS( vSTICHTAG, 'Import_NVR_KUS', 'Stichtag', vZeile );
+    endif;
+    
+    vKostenVertriebIG_SQL=IF (vKostenVertriebIG@='', 'NULL', 'REPLACE('''|vKostenVertriebIG|''', '','', ''.'')');
+    vKostenProdukt_SQL=IF (vKostenProdukt@='', 'NULL', 'REPLACE('''|vKostenProdukt|''', '','', ''.'')');
+    vKostenMarktfolge_SQL=IF (vKostenMarktfolge@='', 'NULL', 'REPLACE('''|vKostenMarktfolge|''', '','', ''.'')');
+    vKosten4_SQL=IF (vKosten4@='', 'NULL', 'REPLACE('''|vKosten4|''', '','', ''.'')');
+    vKosten5_SQL=IF (vKosten5@='', 'NULL', 'REPLACE('''|vKosten5|''', '','', ''.'')');
+    vKostenVertrieb_SQL=IF (vKostenVertrieb@='', 'NULL', 'REPLACE('''|vKostenVertrieb|''', '','', ''.'')');
+    
+    if (vStichtag@<>'');
+        vSQL='insert into csv_nvr_kosten values('''|vStichtag|''','''|vEinheit|''','|vKostenVertriebIG_SQL|','|vKostenProdukt_SQL|','|vKostenMarktfolge_SQL|','|vKosten4_SQL|','|vKosten5_SQL|','|vKostenVertrieb_SQL|',NULL,sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+
+ODBCClose( 'co1' );
+#endregion

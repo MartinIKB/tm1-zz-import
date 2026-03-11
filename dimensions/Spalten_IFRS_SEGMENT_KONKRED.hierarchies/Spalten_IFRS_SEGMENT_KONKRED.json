@@ -1,0 +1,16 @@
+{
+	"@type":"Hierarchy",
+	"Name":"Spalten_IFRS_SEGMENT_KONKRED",
+	"Elements":
+	[
+		{
+			"Name":"PVS",
+			"Type":"String"
+		},
+		{
+			"Name":"KONKRED_SEGMENT",
+			"Type":"String"
+		}
+	],
+	"Subsets@Code.links":[]
+}

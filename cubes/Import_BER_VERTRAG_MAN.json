@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_BER_VERTRAG_MAN",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_BER_VERTRAG_MAN')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_BER_VERTRAG_MAN.views/Default.json"
+	]
+}

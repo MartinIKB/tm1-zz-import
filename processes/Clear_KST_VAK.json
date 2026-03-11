@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Clear_KST_VAK",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_KST_VAK.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

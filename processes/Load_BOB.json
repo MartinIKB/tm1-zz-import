@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Load_BOB",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Load_BOB.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

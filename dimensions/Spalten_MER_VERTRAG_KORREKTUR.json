@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_MER_VERTRAG_KORREKTUR",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_MER_VERTRAG_KORREKTUR.hierarchies/Spalten_MER_VERTRAG_KORREKTUR.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_MER_VERTRAG_KORREKTUR')/Hierarchies('Spalten_MER_VERTRAG_KORREKTUR')"
+	}
+}

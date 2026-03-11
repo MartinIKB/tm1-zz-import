@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Clear_KST_MELDEDATEN",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_KST_MELDEDATEN.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

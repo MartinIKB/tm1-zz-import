@@ -1,0 +1,12 @@
+{
+	"@type":"Process",
+	"Name":"Clear_IFRS_HGB",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_IFRS_HGB.ti",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

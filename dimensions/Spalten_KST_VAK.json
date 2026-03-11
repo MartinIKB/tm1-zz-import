@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_KST_VAK",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_KST_VAK.hierarchies/Spalten_KST_VAK.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_KST_VAK')/Hierarchies('Spalten_KST_VAK')"
+	}
+}

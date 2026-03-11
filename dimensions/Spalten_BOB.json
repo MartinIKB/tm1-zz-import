@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_BOB",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_BOB.hierarchies/Spalten_BOB.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_BOB')/Hierarchies('Spalten_BOB')"
+	}
+}

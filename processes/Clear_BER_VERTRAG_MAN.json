@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Clear_BER_VERTRAG_MAN",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_BER_VERTRAG_MAN.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

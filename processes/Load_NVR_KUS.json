@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Load_NVR_KUS",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Load_NVR_KUS.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

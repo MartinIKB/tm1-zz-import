@@ -1,0 +1,167 @@
+#region Prolog
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+vBER_STICHTAG_Default=CellGetS( 'Import_BER_VERTRAG_MAN', 'BER_STICHTAG', 'Zeile_1' );
+#Umwandlung der Datumswerte vom fünfstelligen Excelformat in DD.MM.YYYY
+if (long(vBER_STICHTAG_Default)=5);
+        vBER_STICHTAG_Default_Excel=NUMBR( vBER_STICHTAG_Default );
+        vBER_STICHTAG_Default=FormatDate( vBER_STICHTAG_Default_Excel, 'dd.MM.yyyy' );
+endif;
+
+LogOutput( 'INFO', 'Löschen des Stichtags '|vBER_STICHTAG_Default| ' aus CSV_PV_VERTRAG_MAN' );
+ODBCOutput( 'co1','delete from CSV_PV_VERTRAG_MAN where ber_stichtag=TO_DATE('''|vBER_STICHTAG_Default|''', ''DD.MM.YYYY'')');
+
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    
+    vBER_STICHTAG=CellGetS( 'Import_BER_VERTRAG_MAN', 'BER_STICHTAG', vZeile );
+    vBUCHUNGSKREIS=CellGetS( 'Import_BER_VERTRAG_MAN', 'BUCHUNGSKREIS', vZeile );
+    vTYP=CellGetS( 'Import_BER_VERTRAG_MAN', 'TYP', vZeile );
+    vKD_NR=CellGetS( 'Import_BER_VERTRAG_MAN', 'KD_NR', vZeile );
+    vLFD_NR=CellGetS( 'Import_BER_VERTRAG_MAN', 'LFD_NR', vZeile );
+    vTRANCHE=CellGetS( 'Import_BER_VERTRAG_MAN', 'TRANCHE', vZeile );
+    vUB_NR=CellGetS( 'Import_BER_VERTRAG_MAN', 'UB_NR', vZeile );
+    vPCS=CellGetS( 'Import_BER_VERTRAG_MAN', 'PCS', vZeile );
+    vSCS=CellGetS( 'Import_BER_VERTRAG_MAN', 'SCS', vZeile );
+    vSPARTE=CellGetS( 'Import_BER_VERTRAG_MAN', 'SPARTE', vZeile );
+    vDURCH_KAPITAL=CellGetS( 'Import_BER_VERTRAG_MAN', 'DURCH_KAPITAL', vZeile );
+    vZINSUEB_SALDO_LFD=CellGetS( 'Import_BER_VERTRAG_MAN', 'ZINSUEB_SALDO_LFD', vZeile );
+    vSALDO_STICHTAG=CellGetS( 'Import_BER_VERTRAG_MAN', 'SALDO_STICHTAG', vZeile );
+    vMARGE_STICHTAG=CellGetS( 'Import_BER_VERTRAG_MAN', 'MARGE_STICHTAG', vZeile );
+    vBONUS_MARGE=CellGetS( 'Import_BER_VERTRAG_MAN', 'BONUS_MARGE', vZeile );
+    vS_T_UB_TYP_SCHL=CellGetS( 'Import_BER_VERTRAG_MAN', 'S_T_UB_TYP_SCHL', vZeile );
+    vRESTAUSZAHLUNG=CellGetS( 'Import_BER_VERTRAG_MAN', 'RESTAUSZAHLUNG', vZeile );
+    vEK_KOSTEN=CellGetS( 'Import_BER_VERTRAG_MAN', 'EK_KOSTEN', vZeile );
+    vRISIKOKOSTEN=CellGetS( 'Import_BER_VERTRAG_MAN', 'RISIKOKOSTEN', vZeile );
+    vFINANZIERUNGSART=CellGetS( 'Import_BER_VERTRAG_MAN', 'FINANZIERUNGSART', vZeile );
+    vHERMES_PROZ=CellGetS( 'Import_BER_VERTRAG_MAN', 'HERMES_PROZ', vZeile );
+    vWAEHR_CODE=CellGetS( 'Import_BER_VERTRAG_MAN', 'WAEHR_CODE', vZeile );
+    vKBEZ=CellGetS( 'Import_BER_VERTRAG_MAN', 'KBEZ', vZeile );
+    vAVS=CellGetS( 'Import_BER_VERTRAG_MAN', 'AVS', vZeile );
+    vLAND=CellGetS( 'Import_BER_VERTRAG_MAN', 'LAND', vZeile );
+    vIKB_BRANCHE=CellGetS( 'Import_BER_VERTRAG_MAN', 'IKB_BRANCHE', vZeile );
+    vBONITAET=CellGetS( 'Import_BER_VERTRAG_MAN', 'BONITAET', vZeile );
+    vSTANDARDRISIKOKOSTEN=CellGetS( 'Import_BER_VERTRAG_MAN', 'STANDARDRISIKOKOSTEN', vZeile );
+    vUSAP=CellGetS( 'Import_BER_VERTRAG_MAN', 'USAP', vZeile );
+    vBETREUUNGSSEGMENT=CellGetS( 'Import_BER_VERTRAG_MAN', 'BETREUUNGSSEGMENT', vZeile );
+    vPRODUKT=CellGetS( 'Import_BER_VERTRAG_MAN', 'PRODUKT', vZeile );
+    vEWB=CellGetS( 'Import_BER_VERTRAG_MAN', 'EWB', vZeile );
+    vKALKUL_VERLUSTE_AUS_VFE=CellGetS( 'Import_BER_VERTRAG_MAN', 'KALKUL_VERLUSTE_AUS_VFE', vZeile );
+    vSONS_BETRIEBL_ERG=CellGetS( 'Import_BER_VERTRAG_MAN', 'SONS_BETRIEBL_ERG', vZeile );
+    vENGA_ZUORD_KZ=CellGetS( 'Import_BER_VERTRAG_MAN', 'ENGA_ZUORD_KZ', vZeile );
+    vSTICHTAGS_RISIKOAKTIVA=CellGetS( 'Import_BER_VERTRAG_MAN', 'STICHTAGS_RISIKOAKTIVA', vZeile );
+    vDURCH_RWA_QUOTE=CellGetS( 'Import_BER_VERTRAG_MAN', 'DURCH_RWA_QUOTE', vZeile );
+    vDURCH_RISIKOAKTIVA=CellGetS( 'Import_BER_VERTRAG_MAN', 'DURCH_RISIKOAKTIVA', vZeile );
+    vPVS=CellGetS( 'Import_BER_VERTRAG_MAN', 'PVS', vZeile );
+    vVVS=CellGetS( 'Import_BER_VERTRAG_MAN', 'VVS', vZeile );
+    vENGA_RISIKO_KZ=CellGetS( 'Import_BER_VERTRAG_MAN', 'ENGA_RISIKO_KZ', vZeile );
+    vRISIKO_MT_NR=CellGetS( 'Import_BER_VERTRAG_MAN', 'RISIKO_MT_NR', vZeile );
+    vFAIR_VALUE_ERGEBNIS=CellGetS( 'Import_BER_VERTRAG_MAN', 'FAIR_VALUE_ERGEBNIS', vZeile );
+    vSONSTIGES_ZINSUEBERSCHUSS=CellGetS( 'Import_BER_VERTRAG_MAN', 'SONSTIGES_ZINSUEBERSCHUSS', vZeile );
+    vCORPORATELAB_AVALPROVISION=CellGetS( 'Import_BER_VERTRAG_MAN', 'CORPORATELAB_AVALPROVISION', vZeile );
+    vZINSERTR_SALDO_LFD=CellGetS( 'Import_BER_VERTRAG_MAN', 'ZINSERTR_SALDO_LFD', vZeile );
+    vZINSAUFW_SALDO_LFD=CellGetS( 'Import_BER_VERTRAG_MAN', 'ZINSAUFW_SALDO_LFD', vZeile );
+    vPV_ZINSERTR_BONI_18_19=CellGetS( 'Import_BER_VERTRAG_MAN', 'PV_ZINSERTR_BONI_18_19', vZeile );
+    vPV_ZINSAUFW_BONI_18_19=CellGetS( 'Import_BER_VERTRAG_MAN', 'PV_ZINSAUFW_BONI_18_19', vZeile );
+    vKBEZ_Escaped = '';
+    
+    iChar = 1;
+    vLength = Long(vKBEZ);
+    
+    While (iChar <= vLength);
+        vCurrentChar = SubSt(vKBEZ, iChar, 1);
+        If (vCurrentChar @= '''');
+            vKBEZ_Escaped = vKBEZ_Escaped | '''''';
+        Else;
+            vKBEZ_Escaped = vKBEZ_Escaped | vCurrentChar;
+        EndIf;
+        iChar = iChar + 1;
+    End;
+
+    
+    #Umwandlung der Datumswerte vom fünfstelligen Excelformat in DD.MM.YYYY
+    if (long(vBER_STICHTAG)=5);
+        vBER_STICHTAG_Excel=NUMBR( vBER_STICHTAG );
+        vBER_STICHTAG=FormatDate( vBER_STICHTAG_Excel, 'dd.MM.YYYY' );
+        CellPutS( vBER_STICHTAG, 'Import_BER_VERTRAG_MAN', 'BER_STICHTAG', vZeile );
+    endif;
+ 
+    if (vBER_STICHTAG@<>'');
+        
+        #Prüfung, ob Tranche und UB_NR leer und ggf. durch 0 ersetzen
+        if (vTRANCHE @='');
+            vtranche='0';
+            CellPutS( vTRANCHE, 'Import_BER_VERTRAG_MAN', 'TRANCHE', vZeile );
+        endif;
+        if (vUB_NR @='');
+            vUB_NR='0';
+            CellPutS( vUB_NR, 'Import_BER_VERTRAG_MAN', 'UB_NR', vZeile );
+        endif; 
+
+        # Vorbereitung der Variablen für SQL Insert
+        vBER_STICHTAG_SQL=IF (vBER_STICHTAG@='', 'NULL', 'TO_DATE('''|vBER_STICHTAG|''', ''DD.MM.YYYY'')');
+        vBUCHUNGSKREIS_SQL=IF (vBUCHUNGSKREIS@='', 'NULL', ''''|vBUCHUNGSKREIS|'''');
+        vTYP_SQL=IF (vTYP@='', 'NULL', ''''|vTYP|'''');
+        vKD_NR_SQL=IF (vKD_NR@='', 'NULL', 'REPLACE('''|vKD_NR|''', '','', ''.'')');
+        vLFD_NR_SQL=IF (vLFD_NR@='', 'NULL', 'REPLACE('''|vLFD_NR|''', '','', ''.'')');
+        vTRANCHE_SQL=IF (vTRANCHE@='', 'NULL', 'REPLACE('''|vTRANCHE|''', '','', ''.'')');
+        vUB_NR_SQL=IF (vUB_NR@='', 'NULL', 'REPLACE('''|vUB_NR|''', '','', ''.'')');
+        vPCS_SQL=IF (vPCS@='', 'NULL', ''''|vPCS|'''');
+        vSCS_SQL=IF (vSCS@='', 'NULL', ''''|vSCS|'''');
+        vSPARTE_SQL=IF (vSPARTE@='', 'NULL', ''''|vSPARTE|'''');
+        vDURCH_KAPITAL_SQL=IF (vDURCH_KAPITAL@='', 'NULL', 'REPLACE('''|vDURCH_KAPITAL|''', '','', ''.'')');
+        vZINSUEB_SALDO_LFD_SQL=IF (vZINSUEB_SALDO_LFD@='', 'NULL', 'REPLACE('''|vZINSUEB_SALDO_LFD|''', '','', ''.'')');
+        vSALDO_STICHTAG_SQL=IF (vSALDO_STICHTAG@='', 'NULL', 'REPLACE('''|vSALDO_STICHTAG|''', '','', ''.'')');
+        vMARGE_STICHTAG_SQL=IF (vMARGE_STICHTAG@='', 'NULL', 'REPLACE('''|vMARGE_STICHTAG|''', '','', ''.'')');
+        vBONUS_MARGE_SQL=IF (vBONUS_MARGE@='', 'NULL', 'REPLACE('''|vBONUS_MARGE|''', '','', ''.'')');
+        vS_T_UB_TYP_SCHL_SQL=IF (vS_T_UB_TYP_SCHL@='', 'NULL', ''''|vS_T_UB_TYP_SCHL|'''');
+        vRESTAUSZAHLUNG_SQL=IF (vRESTAUSZAHLUNG@='', 'NULL', 'REPLACE('''|vRESTAUSZAHLUNG|''', '','', ''.'')');
+        vEK_KOSTEN_SQL=IF (vEK_KOSTEN@='', 'NULL', 'REPLACE('''|vEK_KOSTEN|''', '','', ''.'')');
+        vRISIKOKOSTEN_SQL=IF (vRISIKOKOSTEN@='', 'NULL', 'REPLACE('''|vRISIKOKOSTEN|''', '','', ''.'')');
+        vFINANZIERUNGSART_SQL=IF (vFINANZIERUNGSART@='', 'NULL', 'REPLACE('''|vFINANZIERUNGSART|''', '','', ''.'')');
+        vHERMES_PROZ_SQL=IF (vHERMES_PROZ@='', 'NULL', 'REPLACE('''|vHERMES_PROZ|''', '','', ''.'')');
+        vWAEHR_CODE_SQL=IF (vWAEHR_CODE@='', 'NULL', ''''|vWAEHR_CODE|'''');
+        vKBEZ_SQL=IF (vKBEZ@='', 'NULL', ''''|vKBEZ_Escaped|'''');
+        vAVS_SQL=IF (vAVS@='', 'NULL', ''''|vAVS|'''');
+        vLAND_SQL=IF (vLAND@='', 'NULL', ''''|vLAND|'''');
+        vIKB_BRANCHE_SQL=IF (vIKB_BRANCHE@='', 'NULL', 'REPLACE('''|vIKB_BRANCHE|''', '','', ''.'')');
+        vBONITAET_SQL=IF (vBONITAET@='', 'NULL', 'REPLACE('''|vBONITAET|''', '','', ''.'')');
+        vSTANDARDRISIKOKOSTEN_SQL=IF (vSTANDARDRISIKOKOSTEN@='', 'NULL', 'REPLACE('''|vSTANDARDRISIKOKOSTEN|''', '','', ''.'')');
+        vUSAP_SQL=IF (vUSAP@='', 'NULL', ''''|vUSAP|'''');
+        vBETREUUNGSSEGMENT_SQL=IF (vBETREUUNGSSEGMENT@='', 'NULL', ''''|vBETREUUNGSSEGMENT|'''');
+        vPRODUKT_SQL=IF (vPRODUKT@='', 'NULL', ''''|vPRODUKT|'''');
+        vEWB_SQL=IF (vEWB@='', 'NULL', 'REPLACE('''|vEWB|''', '','', ''.'')');
+        vKALKUL_VERLUSTE_AUS_VFE_SQL=IF (vKALKUL_VERLUSTE_AUS_VFE@='', 'NULL', 'REPLACE('''|vKALKUL_VERLUSTE_AUS_VFE|''', '','', ''.'')');
+        vSONS_BETRIEBL_ERG_SQL=IF (vSONS_BETRIEBL_ERG@='', 'NULL', 'REPLACE('''|vSONS_BETRIEBL_ERG|''', '','', ''.'')');
+        vENGA_ZUORD_KZ_SQL=IF (vENGA_ZUORD_KZ@='', 'NULL', ''''|vENGA_ZUORD_KZ|'''');
+        vSTICHTAGS_RISIKOAKTIVA_SQL=IF (vSTICHTAGS_RISIKOAKTIVA@='', 'NULL', 'REPLACE('''|vSTICHTAGS_RISIKOAKTIVA|''', '','', ''.'')');
+        vDURCH_RWA_QUOTE_SQL=IF (vDURCH_RWA_QUOTE@='', 'NULL', 'REPLACE('''|vDURCH_RWA_QUOTE|''', '','', ''.'')');
+        vDURCH_RISIKOAKTIVA_SQL=IF (vDURCH_RISIKOAKTIVA@='', 'NULL', 'REPLACE('''|vDURCH_RISIKOAKTIVA|''', '','', ''.'')');
+        vPVS_SQL=IF (vPVS@='', 'NULL', 'REPLACE('''|vPVS|''', '','', ''.'')');
+        vVVS_SQL=IF (vVVS@='', 'NULL', ''''|vVVS|'''');
+        vENGA_RISIKO_KZ_SQL=IF (vENGA_RISIKO_KZ@='', 'NULL', ''''|vENGA_RISIKO_KZ|'''');
+        vRISIKO_MT_NR_SQL=IF (vRISIKO_MT_NR@='', 'NULL', 'REPLACE('''|vRISIKO_MT_NR|''', '','', ''.'')');
+        vFAIR_VALUE_ERGEBNIS_SQL=IF (vFAIR_VALUE_ERGEBNIS@='', 'NULL', 'REPLACE('''|vFAIR_VALUE_ERGEBNIS|''', '','', ''.'')');
+        vSONSTIGES_ZINSUEBERSCHUSS_SQL=IF (vSONSTIGES_ZINSUEBERSCHUSS@='', 'NULL', 'REPLACE('''|vSONSTIGES_ZINSUEBERSCHUSS|''', '','', ''.'')');
+        vCORPORATELAB_AVALPROVISION_SQL=IF (vCORPORATELAB_AVALPROVISION@='', 'NULL', 'REPLACE('''|vCORPORATELAB_AVALPROVISION|''', '','', ''.'')');
+        vZINSERTR_SALDO_LFD_SQL=IF (vZINSERTR_SALDO_LFD@='', 'NULL', 'REPLACE('''|vZINSERTR_SALDO_LFD|''', '','', ''.'')');
+        vZINSAUFW_SALDO_LFD_SQL=IF (vZINSAUFW_SALDO_LFD@='', 'NULL', 'REPLACE('''|vZINSAUFW_SALDO_LFD|''', '','', ''.'')');
+        vPV_ZINSERTR_BONI_18_19_SQL=IF (vPV_ZINSERTR_BONI_18_19@='', 'NULL', 'REPLACE('''|vPV_ZINSERTR_BONI_18_19|''', '','', ''.'')');
+        vPV_ZINSAUFW_BONI_18_19_SQL=IF (vPV_ZINSAUFW_BONI_18_19@='', 'NULL', 'REPLACE('''|vPV_ZINSAUFW_BONI_18_19|''', '','', ''.'')');
+        vSQL='insert into CSV_PV_VERTRAG_MAN values(' | vBER_STICHTAG_SQL | ',' | vBUCHUNGSKREIS_SQL | ',' | vTYP_SQL | ',' | vKD_NR_SQL | ',' | vLFD_NR_SQL | ',' | vTRANCHE_SQL | ',' | vUB_NR_SQL | ',' | vPCS_SQL | ',' | vSCS_SQL | ',' | vSPARTE_SQL | ',' | vDURCH_KAPITAL_SQL | ',' | vZINSUEB_SALDO_LFD_SQL | ',' | vSALDO_STICHTAG_SQL | ',' | vMARGE_STICHTAG_SQL | ',' | vBONUS_MARGE_SQL | ',' | vS_T_UB_TYP_SCHL_SQL | ',' | vRESTAUSZAHLUNG_SQL | ',' | vEK_KOSTEN_SQL | ',' | vRISIKOKOSTEN_SQL | ',' | vFINANZIERUNGSART_SQL | ',' | vHERMES_PROZ_SQL | ',' | vWAEHR_CODE_SQL | ',' | vKBEZ_SQL | ',' | vAVS_SQL | ',' | vLAND_SQL | ',' | vIKB_BRANCHE_SQL | ',' | vBONITAET_SQL | ',' | vSTANDARDRISIKOKOSTEN_SQL | ',' | vUSAP_SQL | ',' | vBETREUUNGSSEGMENT_SQL | ',' | vPRODUKT_SQL | ',' | vEWB_SQL | ',' | vKALKUL_VERLUSTE_AUS_VFE_SQL | ',' | vSONS_BETRIEBL_ERG_SQL | ',' | vENGA_ZUORD_KZ_SQL | ',' | vSTICHTAGS_RISIKOAKTIVA_SQL | ',' | vDURCH_RWA_QUOTE_SQL | ',' | vDURCH_RISIKOAKTIVA_SQL | ',' | vPVS_SQL | ',' | vVVS_SQL | ',' | vENGA_RISIKO_KZ_SQL | ',' | vRISIKO_MT_NR_SQL | ',' | vFAIR_VALUE_ERGEBNIS_SQL | ',' | vSONSTIGES_ZINSUEBERSCHUSS_SQL | ',' | vCORPORATELAB_AVALPROVISION_SQL | ',' | vZINSERTR_SALDO_LFD_SQL | ',' | vZINSAUFW_SALDO_LFD_SQL | ',' | vPV_ZINSERTR_BONI_18_19_SQL | ',' | vPV_ZINSAUFW_BONI_18_19_SQL | ',sysdate)';
+
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+ODBCClose( 'co1' );
+#endregion

@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_IFRS_HGB",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_IFRS_HGB.hierarchies/Spalten_IFRS_HGB.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_IFRS_HGB')/Hierarchies('Spalten_IFRS_HGB')"
+	}
+}

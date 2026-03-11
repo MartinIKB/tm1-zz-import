@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_NVR_KUS",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_NVR_KUS.hierarchies/Spalten_NVR_KUS.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_NVR_KUS')/Hierarchies('Spalten_NVR_KUS')"
+	}
+}

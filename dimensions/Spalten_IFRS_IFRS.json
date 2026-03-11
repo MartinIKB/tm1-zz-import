@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_IFRS_IFRS",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_IFRS_IFRS.hierarchies/Spalten_IFRS_IFRS.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_IFRS_IFRS')/Hierarchies('Spalten_IFRS_IFRS')"
+	}
+}

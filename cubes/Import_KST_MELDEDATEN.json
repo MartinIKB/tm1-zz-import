@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_KST_MELDEDATEN",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Zeilen')"
+		},
+		{
+			"@id":"Dimensions('Spalten_KST_MELDEDATEN')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_KST_MELDEDATEN.views/Default.json"
+	]
+}

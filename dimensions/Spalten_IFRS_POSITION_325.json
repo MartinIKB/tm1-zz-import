@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_IFRS_POSITION_325",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_IFRS_POSITION_325.hierarchies/Spalten_IFRS_POSITION_325.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_IFRS_POSITION_325')/Hierarchies('Spalten_IFRS_POSITION_325')"
+	}
+}

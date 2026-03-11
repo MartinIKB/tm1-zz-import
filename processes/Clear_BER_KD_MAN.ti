@@ -1,0 +1,6 @@
+#region Prolog
+
+CubeClearData('Import_BER_KD_MAN');
+
+
+#endregion

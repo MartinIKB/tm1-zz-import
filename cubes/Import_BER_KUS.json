@@ -1,0 +1,18 @@
+{
+	"@type":"Cube",
+	"Name":"Import_BER_KUS",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_BER_KUS')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_BER_KUS.views/Default.json",
+		"Import_BER_KUS.views/Default ohne leere Zeilen.json"
+	]
+}

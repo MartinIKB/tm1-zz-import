@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_IFRS_SEGMENT_KONKRED",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_IFRS_SEGMENT_KONKRED.hierarchies/Spalten_IFRS_SEGMENT_KONKRED.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_IFRS_SEGMENT_KONKRED')/Hierarchies('Spalten_IFRS_SEGMENT_KONKRED')"
+	}
+}

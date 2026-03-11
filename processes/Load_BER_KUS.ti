@@ -1,0 +1,39 @@
+#region Prolog
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+vMonatsscheibe_Default=CellGetS( 'Import_BER_KUS', 'Monatsscheibe', 'Zeile_1' );
+
+LogOutput( 'INFO', 'Löschen der Monatsscheibe '|vMonatsscheibe_Default| ' aus CSV_PV_KUS' );
+ODBCOutput( 'co1','delete from csv_pv_kus where monatsscheibe='''|vMonatsscheibe_Default|'''');
+
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vMonatsscheibe=CellGetS( 'Import_BER_KUS', 'Monatsscheibe', vZeile );
+    vKostentyp=CellGetS( 'Import_BER_KUS', 'Kostentyp', vZeile );
+    vKostenstelle=CellGetS( 'Import_BER_KUS', 'Kostenstelle', vZeile );
+    vKostenart=CellGetS( 'Import_BER_KUS', 'Kostenart', vZeile );
+    vBetrag=CellGetS( 'Import_BER_KUS', 'Betrag', vZeile );
+
+    if (vMonatsscheibe@<>'');
+        vSQL='insert into csv_pv_kus values('''|vMonatsscheibe|''','''|vKostentyp|''','''|vKostenstelle|''','''|vKostenart|''',REPLACE('''|vBetrag|''', '','', ''.''),sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+ODBCClose( 'co1' );
+#endregion
+#region Metadata
+
+
+#endregion

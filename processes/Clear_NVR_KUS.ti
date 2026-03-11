@@ -1,0 +1,4 @@
+#region Prolog
+
+CubeClearData('Import_NVR_KUS');
+#endregion

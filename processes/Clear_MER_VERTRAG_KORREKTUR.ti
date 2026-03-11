@@ -1,0 +1,4 @@
+#region Prolog
+
+CubeClearData('Import_MER_VERTRAG_KORREKTUR');
+#endregion

@@ -1,0 +1,28 @@
+{
+	"@type":"Hierarchy",
+	"Name":"Spalten_BER_KUS",
+	"Elements":
+	[
+		{
+			"Name":"Monatsscheibe",
+			"Type":"String"
+		},
+		{
+			"Name":"Kostentyp",
+			"Type":"String"
+		},
+		{
+			"Name":"Kostenstelle",
+			"Type":"String"
+		},
+		{
+			"Name":"Kostenart",
+			"Type":"String"
+		},
+		{
+			"Name":"Betrag",
+			"Type":"String"
+		}
+	],
+	"Subsets@Code.links":[]
+}

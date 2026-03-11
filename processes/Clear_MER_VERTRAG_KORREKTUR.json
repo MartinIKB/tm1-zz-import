@@ -1,0 +1,13 @@
+{
+	"@type":"Process",
+	"Name":"Clear_MER_VERTRAG_KORREKTUR",
+	"HasSecurityAccess":false,
+	"Code@Code.link":"Clear_MER_VERTRAG_KORREKTUR.ti",
+	"UIData":"_ParameterConstraints=e30=€",
+	"DataSource":
+	{
+		"Type":"None"
+	},
+	"Parameters":[],
+	"Variables":[]
+}

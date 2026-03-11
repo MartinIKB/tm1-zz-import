@@ -1,0 +1,3 @@
+#region Prolog
+CubeClearData('Import_KST_MELDEDATEN');
+#endregion

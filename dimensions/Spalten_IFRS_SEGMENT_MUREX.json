@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_IFRS_SEGMENT_MUREX",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_IFRS_SEGMENT_MUREX.hierarchies/Spalten_IFRS_SEGMENT_MUREX.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_IFRS_SEGMENT_MUREX')/Hierarchies('Spalten_IFRS_SEGMENT_MUREX')"
+	}
+}

@@ -1,0 +1,17 @@
+{
+	"@type":"Cube",
+	"Name":"Import_BOB",
+	"Dimensions":
+	[
+		{
+			"@id":"Dimensions('Spalten_BOB')"
+		},
+		{
+			"@id":"Dimensions('Zeilen')"
+		}
+	],
+	"Views@Code.links":
+	[
+		"Import_BOB.views/Default.json"
+	]
+}

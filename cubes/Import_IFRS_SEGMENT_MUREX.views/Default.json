@@ -1,0 +1,21 @@
+{
+	"@type":"MDXView",
+	"Name":"Default",
+	"MDX@Code.link":"Default.mdx",
+	"IsAutocalculate" : true,
+	"IsDeferComputeOnLeafDataEntry" : false,
+	"IsSuppressComputeOnOpen" : false,
+	"Meta" : 
+	{
+		"Aliases" : {},
+		"ContextSets" : {},
+		"ExpandAboves" : 
+		{
+			"[Spalten_IFRS_SEGMENT_MUREX].[Spalten_IFRS_SEGMENT_MUREX]" : false,
+			"[Zeilen].[Zeilen]" : false
+		}
+	},
+	"ViewExtractSkipConsolidatedValues" : true,
+	"ViewExtractSkipRuleValues" : false,
+	"ViewExtractSkipZeroes" : true
+}

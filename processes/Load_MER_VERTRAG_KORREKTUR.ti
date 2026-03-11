@@ -1,0 +1,165 @@
+#region Prolog
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+vSTICHTAG_Default=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'STICHTAG', 'Zeile_1' );
+#Umwandlung der Datumswerte vom fünfstelligen Excelformat in DD.MM.YYYY
+if (long(vSTICHTAG_Default)=5);
+        vSTICHTAG_Default_Excel=NUMBR( vSTICHTAG_Default );
+        vSTICHTAG_Default=FormatDate( vSTICHTAG_Default_Excel, 'dd.MM.yyyy' );
+endif;
+
+LogOutput( 'INFO', 'Löschen des Stichtags '|vSTICHTAG_Default| ' aus CSV_MER_VERTRAG_KORREKTUR' );
+ODBCOutput( 'co1','delete from CSV_MER_VERTRAG_KORREKTUR where stichtag=TO_DATE('''|vSTICHTAG_Default|''', ''DD.MM.YYYY'')');
+
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vMONATSSCHEIBE=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'MONATSSCHEIBE', vZeile );
+    vAKTION=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'AKTION', vZeile );
+    vSICHTWEISE=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'SICHTWEISE', vZeile );
+    vKD_NR=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'KD_NR', vZeile );
+    vLFD_NR=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'LFD_NR', vZeile );
+    vTRANCHE=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'TRANCHE', vZeile );
+    vTYP=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'TYP', vZeile );
+    vUB_NR=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'UB_NR', vZeile );
+    vBUCHUNGSKREIS=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'BUCHUNGSKREIS', vZeile );
+    vVVS=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VVS', vZeile );
+    vPVS=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'PVS', vZeile );
+    vCF_DAT=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'CF_DAT', vZeile );
+    vLIQUIDITAETWIRKSAME_AUSZAHLUNG=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'LIQUIDITAETWIRKSAME_AUSZAHLUNG', vZeile );
+    vGEBUEHREN_PROVISIONEN=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'GEBUEHREN_PROVISIONEN', vZeile );
+    vDISAGIO=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'DISAGIO', vZeile );
+    vBUERGSCHAFTEN=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'BUERGSCHAFTEN', vZeile );
+    vPROGRAMMKREDITE=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'PROGRAMMKREDITE', vZeile );
+    vGLOBALDARLEHEN=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'GLOBALDARLEHEN', vZeile );
+    vUMSCHULDUNGEN=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'UMSCHULDUNGEN', vZeile );
+    vVR_BARWERT_KUNO=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_KUNO', vZeile );
+    vVR_BARWERT_FUND=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_FUND', vZeile );
+    vVR_BARWERT_PROM=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_PROM', vZeile );
+    vVR_BARWERT_ROCM=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_ROCM', vZeile );
+    vVR_BARWERT_PRKO=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_PRKO', vZeile );
+    vVR_BARWERT_EKMA=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_EKMA', vZeile );
+    vVR_BW_EFF_KAP=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BW_EFF_KAP', vZeile );
+    vVR_RESTAUSZAHL_BETRAG=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_RESTAUSZAHL_BETRAG', vZeile );
+    vNEUE_ZUSAGEN=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'NEUE_ZUSAGEN', vZeile );
+    vBERMERKUNGEN=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'BERMERKUNGEN', vZeile );
+    vMLZ=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'MLZ', vZeile );
+    vVR_BARWERT_PPKO=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_PPKO', vZeile );
+    vGEBUNDENES_EIGENKAPITAL=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'GEBUNDENES_EIGENKAPITAL', vZeile );
+    vVR_BARWERT_STUK=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_STUK', vZeile );
+    vCF_TYP=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'CF_TYP', vZeile );
+    vVR_EFF_KAP=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_EFF_KAP', vZeile );
+    vVR_NOM_KAP=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_NOM_KAP', vZeile );
+    vSTICHTAG=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'STICHTAG', vZeile );
+    vIRU=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'IRU', vZeile );
+    vBPM=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'BPM', vZeile );
+    vBONITAET=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'BONITAET', vZeile );
+    vGLOBALDARLEHEN_KZ=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'GLOBALDARLEHEN_KZ', vZeile );
+    vKRED_MITTEL=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'KRED_MITTEL', vZeile );
+    vMAX_UMSATZ_KATEGORIE=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'MAX_UMSATZ_KATEGORIE', vZeile );
+    vKBEZ=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'KBEZ', vZeile );
+    vVR_BARWERT_PZKO=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_PZKO', vZeile );
+    vVR_BARWERT_FLOOR=CellGetS( 'Import_MER_VERTRAG_KORREKTUR', 'VR_BARWERT_FLOOR', vZeile );
+    
+    vKBEZ_Escaped = '';
+    iChar = 1;
+    vLength = Long(vKBEZ);
+        While (iChar <= vLength);
+        vCurrentChar = SubSt(vKBEZ, iChar, 1);
+        If (vCurrentChar @= '''');
+            vKBEZ_Escaped = vKBEZ_Escaped | '''''';
+        Else;
+            vKBEZ_Escaped = vKBEZ_Escaped | vCurrentChar;
+        EndIf;
+        iChar = iChar + 1;
+    End;
+
+    #Umwandlung der Datumswerte vom fünfstelligen Excelformat in DD.MM.YYYY
+    if (long(vSTICHTAG)=5);
+        vSTICHTAG_Excel=NUMBR( vSTICHTAG );
+        vSTICHTAG=FormatDate( vSTICHTAG_Excel, 'dd.MM.yyyy' );
+        CellPutS( vSTICHTAG, 'Import_MER_VERTRAG_KORREKTUR', 'STICHTAG', vZeile );
+    endif;
+        if (long(vCF_DAT)=5);
+        vCF_DAT_Excel=NUMBR( vCF_DAT );
+        vCF_DAT=FormatDate( vCF_DAT_Excel, 'dd.MM.yyyy' );
+        CellPutS( vCF_DAT, 'Import_MER_VERTRAG_KORREKTUR', 'CF_DAT', vZeile );
+    endif;
+    
+    if (vMONATSSCHEIBE@<>'');
+        
+        #Prüfung, ob Tranche und UB_NR leer und ggf. durch 0 ersetzen
+        if (vTRANCHE @='');
+            vtranche='0';
+            CellPutS( vTRANCHE, 'Import_MER_VERTRAG_KORREKTUR', 'TRANCHE', vZeile );
+        endif;
+        if (vUB_NR @='');
+            vUB_NR='0';
+            CellPutS( vUB_NR, 'Import_MER_VERTRAG_KORREKTUR', 'UB_NR', vZeile );
+        endif; 
+
+        # Vorbereitung der Variablen für SQL Insert
+        vMONATSSCHEIBE_SQL=IF (vMONATSSCHEIBE@='', 'NULL', ''''|vMONATSSCHEIBE|'''');
+        vAKTION_SQL=IF (vAKTION@='', 'NULL', ''''|vAKTION|'''');
+        vSICHTWEISE_SQL=IF (vSICHTWEISE@='', 'NULL', ''''|vSICHTWEISE|'''');
+        vKD_NR_SQL=IF (vKD_NR@='', 'NULL', 'REPLACE('''|vKD_NR|''', '','', ''.'')');
+        vLFD_NR_SQL=IF (vLFD_NR@='', 'NULL', 'REPLACE('''|vLFD_NR|''', '','', ''.'')');
+        vTRANCHE_SQL=IF (vTRANCHE@='', 'NULL', 'REPLACE('''|vTRANCHE|''', '','', ''.'')');
+        vTYP_SQL=IF (vTYP@='', 'NULL', ''''|vTYP|'''');
+        vUB_NR_SQL=IF (vUB_NR@='', 'NULL', 'REPLACE('''|vUB_NR|''', '','', ''.'')');
+        vBUCHUNGSKREIS_SQL=IF (vBUCHUNGSKREIS@='', 'NULL', 'REPLACE('''|vBUCHUNGSKREIS|''', '','', ''.'')');
+        vVVS_SQL=IF (vVVS@='', 'NULL', ''''|vVVS|'''');
+        vPVS_SQL=IF (vPVS@='', 'NULL', 'REPLACE('''|vPVS|''', '','', ''.'')');
+        vCF_DAT_SQL=IF (vCF_DAT@='', 'NULL', 'TO_DATE('''|vCF_DAT|''', ''DD.MM.YYYY'')');
+        vLIQUIDITAETWIRKSAME_AUSZAHLUNG_SQL=IF (vLIQUIDITAETWIRKSAME_AUSZAHLUNG@='', 'NULL', 'REPLACE('''|vLIQUIDITAETWIRKSAME_AUSZAHLUNG|''', '','', ''.'')');
+        vGEBUEHREN_PROVISIONEN_SQL=IF (vGEBUEHREN_PROVISIONEN@='', 'NULL', 'REPLACE('''|vGEBUEHREN_PROVISIONEN|''', '','', ''.'')');
+        vDISAGIO_SQL=IF (vDISAGIO@='', 'NULL', 'REPLACE('''|vDISAGIO|''', '','', ''.'')');
+        vBUERGSCHAFTEN_SQL=IF (vBUERGSCHAFTEN@='', 'NULL', 'REPLACE('''|vBUERGSCHAFTEN|''', '','', ''.'')');
+        vPROGRAMMKREDITE_SQL=IF (vPROGRAMMKREDITE@='', 'NULL', 'REPLACE('''|vPROGRAMMKREDITE|''', '','', ''.'')');
+        vGLOBALDARLEHEN_SQL=IF (vGLOBALDARLEHEN@='', 'NULL', 'REPLACE('''|vGLOBALDARLEHEN|''', '','', ''.'')');
+        vUMSCHULDUNGEN_SQL=IF (vUMSCHULDUNGEN@='', 'NULL', 'REPLACE('''|vUMSCHULDUNGEN|''', '','', ''.'')');
+        vVR_BARWERT_KUNO_SQL=IF (vVR_BARWERT_KUNO@='', 'NULL', 'REPLACE('''|vVR_BARWERT_KUNO|''', '','', ''.'')');
+        vVR_BARWERT_FUND_SQL=IF (vVR_BARWERT_FUND@='', 'NULL', 'REPLACE('''|vVR_BARWERT_FUND|''', '','', ''.'')');
+        vVR_BARWERT_PROM_SQL=IF (vVR_BARWERT_PROM@='', 'NULL', 'REPLACE('''|vVR_BARWERT_PROM|''', '','', ''.'')');
+        vVR_BARWERT_ROCM_SQL=IF (vVR_BARWERT_ROCM@='', 'NULL', 'REPLACE('''|vVR_BARWERT_ROCM|''', '','', ''.'')');
+        vVR_BARWERT_PRKO_SQL=IF (vVR_BARWERT_PRKO@='', 'NULL', 'REPLACE('''|vVR_BARWERT_PRKO|''', '','', ''.'')');
+        vVR_BARWERT_EKMA_SQL=IF (vVR_BARWERT_EKMA@='', 'NULL', 'REPLACE('''|vVR_BARWERT_EKMA|''', '','', ''.'')');
+        vVR_BW_EFF_KAP_SQL=IF (vVR_BW_EFF_KAP@='', 'NULL', 'REPLACE('''|vVR_BW_EFF_KAP|''', '','', ''.'')');
+        vVR_RESTAUSZAHL_BETRAG_SQL=IF (vVR_RESTAUSZAHL_BETRAG@='', 'NULL', 'REPLACE('''|vVR_RESTAUSZAHL_BETRAG|''', '','', ''.'')');
+        vNEUE_ZUSAGEN_SQL=IF (vNEUE_ZUSAGEN@='', 'NULL', 'REPLACE('''|vNEUE_ZUSAGEN|''', '','', ''.'')');
+        vBERMERKUNGEN_SQL=IF (vBERMERKUNGEN@='', 'NULL', ''''|vBERMERKUNGEN|'''');
+        vMLZ_SQL=IF (vMLZ@='', 'NULL', 'REPLACE('''|vMLZ|''', '','', ''.'')');
+        vVR_BARWERT_PPKO_SQL=IF (vVR_BARWERT_PPKO@='', 'NULL', 'REPLACE('''|vVR_BARWERT_PPKO|''', '','', ''.'')');
+        vGEBUNDENES_EIGENKAPITAL_SQL=IF (vGEBUNDENES_EIGENKAPITAL@='', 'NULL', 'REPLACE('''|vGEBUNDENES_EIGENKAPITAL|''', '','', ''.'')');
+        vVR_BARWERT_STUK_SQL=IF (vVR_BARWERT_STUK@='', 'NULL', 'REPLACE('''|vVR_BARWERT_STUK|''', '','', ''.'')');
+        vCF_TYP_SQL=IF (vCF_TYP@='', 'NULL', ''''|vCF_TYP|'''');
+        vVR_EFF_KAP_SQL=IF (vVR_EFF_KAP@='', 'NULL', 'REPLACE('''|vVR_EFF_KAP|''', '','', ''.'')');
+        vVR_NOM_KAP_SQL=IF (vVR_NOM_KAP@='', 'NULL', 'REPLACE('''|vVR_NOM_KAP|''', '','', ''.'')');
+        vSTICHTAG_SQL=IF (vSTICHTAG@='', 'NULL', 'TO_DATE('''|vSTICHTAG|''', ''DD.MM.YYYY'')');
+        vIRU_SQL=IF (vIRU@='', 'NULL', ''''|vIRU|'''');
+        vBPM_SQL=IF (vBPM@='', 'NULL', ''''|vBPM|'''');
+        vBONITAET_SQL=IF (vBONITAET@='', 'NULL', 'REPLACE('''|vBONITAET|''', '','', ''.'')');
+        vGLOBALDARLEHEN_KZ_SQL=IF (vGLOBALDARLEHEN_KZ@='', 'NULL', ''''|vGLOBALDARLEHEN_KZ|'''');
+        vKRED_MITTEL_SQL=IF (vKRED_MITTEL@='', 'NULL', ''''|vKRED_MITTEL|'''');
+        vMAX_UMSATZ_KATEGORIE_SQL=IF (vMAX_UMSATZ_KATEGORIE@='', 'NULL', ''''|vMAX_UMSATZ_KATEGORIE|'''');
+        vKBEZ_SQL=IF (vKBEZ@='', 'NULL', ''''|vKBEZ_Escaped|'''');
+        vVR_BARWERT_PZKO_SQL=IF (vVR_BARWERT_PZKO@='', 'NULL', 'REPLACE('''|vVR_BARWERT_PZKO|''', '','', ''.'')');
+        vVR_BARWERT_FLOOR_SQL=IF (vVR_BARWERT_FLOOR@='', 'NULL', 'REPLACE('''|vVR_BARWERT_FLOOR|''', '','', ''.'')');
+        
+        vSQL='insert into CSV_MER_VERTRAG_KORREKTUR values(' | vMONATSSCHEIBE_SQL | ',' | vAKTION_SQL | ',' | vSICHTWEISE_SQL | ',' | vKD_NR_SQL | ',' | vLFD_NR_SQL | ',' | vTRANCHE_SQL | ',' | vTYP_SQL | ',' | vUB_NR_SQL | ',' | vBUCHUNGSKREIS_SQL | ',' | vVVS_SQL | ',' | vPVS_SQL | ',' | vCF_DAT_SQL | ',' | vLIQUIDITAETWIRKSAME_AUSZAHLUNG_SQL | ',' | vGEBUEHREN_PROVISIONEN_SQL | ',' | vDISAGIO_SQL | ',' | vBUERGSCHAFTEN_SQL | ',' | vPROGRAMMKREDITE_SQL | ',' | vGLOBALDARLEHEN_SQL | ',' | vUMSCHULDUNGEN_SQL | ',' | vVR_BARWERT_KUNO_SQL | ',' | vVR_BARWERT_FUND_SQL | ',' | vVR_BARWERT_PROM_SQL | ',' | vVR_BARWERT_ROCM_SQL | ',' | vVR_BARWERT_PRKO_SQL | ',' | vVR_BARWERT_EKMA_SQL | ',' | vVR_BW_EFF_KAP_SQL | ',' | vVR_RESTAUSZAHL_BETRAG_SQL | ',' | vNEUE_ZUSAGEN_SQL | ',' | vBERMERKUNGEN_SQL | ',' | vMLZ_SQL | ',' | vVR_BARWERT_PPKO_SQL | ',' | vGEBUNDENES_EIGENKAPITAL_SQL | ',' | vVR_BARWERT_STUK_SQL | ',' | vCF_TYP_SQL | ',' | vVR_EFF_KAP_SQL | ',' | vVR_NOM_KAP_SQL | ',' | vSTICHTAG_SQL | ',' | vIRU_SQL | ',' | vBPM_SQL | ',' | vBONITAET_SQL | ',' | vGLOBALDARLEHEN_KZ_SQL | ',' | vKRED_MITTEL_SQL | ',' | vMAX_UMSATZ_KATEGORIE_SQL | ',' | vKBEZ_SQL | ',' | vVR_BARWERT_PZKO_SQL | ',' | vVR_BARWERT_FLOOR_SQL | ',sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+    endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+ODBCClose( 'co1' );
+#endregion

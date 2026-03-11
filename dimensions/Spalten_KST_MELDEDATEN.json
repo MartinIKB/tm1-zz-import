@@ -1,0 +1,12 @@
+{
+	"@type":"Dimension",
+	"Name":"Spalten_KST_MELDEDATEN",
+	"Hierarchies@Code.links":
+	[
+		"Spalten_KST_MELDEDATEN.hierarchies/Spalten_KST_MELDEDATEN.json"
+	],
+	"DefaultHierarchy":
+	{
+		"@id":"Dimensions('Spalten_KST_MELDEDATEN')/Hierarchies('Spalten_KST_MELDEDATEN')"
+	}
+}

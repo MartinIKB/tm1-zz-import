@@ -1,0 +1,36 @@
+#region Prolog
+
+ODBCOpen( 'co1','f_prod_data','access_prod' );
+
+vMonatsscheibe_Default=CellGetS( 'Import_KST_VAK', 'Monatsscheibe', 'Zeile_1' );
+
+LogOutput( 'INFO', 'Löschen der Monatsscheibe '|vMonatsscheibe_Default| ' aus CSV_PV_VAK' );
+ODBCOutput( 'co1','delete from csv_kst_vak where monatsscheibe='''|vMonatsscheibe_Default|'''');
+
+SubsetCreatebyMDX( 'sZeilen', '{[Zeilen].[Zeilen].MEMBERS}', 1 );
+
+vAnzahlSubsetZeilen=SubsetGetSize( 'Zeilen','sZeilen');
+iZaehlerZeilenGesamt=0;
+iZaehlerZeilenGeladen=0;
+
+while (iZaehlerZeilenGesamt<vAnzahlSubsetZeilen) ;
+    iZaehlerZeilenGesamt=iZaehlerZeilenGesamt+1;
+    
+    
+
+    vZeile=SubsetGetElementName( 'Zeilen', 'sZeilen', iZaehlerZeilenGesamt );
+    vMonatsscheibe=CellGetS( 'Import_KST_VAK', 'Monatsscheibe', vZeile );
+    vKostenstelle=CellGetS( 'Import_KST_VAK', 'Kostenstelle', vZeile );
+    vVAK=CellGetS( 'Import_KST_VAK', 'VAK', vZeile );
+
+    if (vMonatsscheibe@<>'');
+        vSQL='insert into csv_kst_vak values('''|vMonatsscheibe|''','''|vKostenstelle|''',REPLACE('''|vVAK|''', '','', ''.''),sysdate)';
+        ODBCOutput( 'co1', vSQL );
+        iZaehlerZeilenGeladen=iZaehlerZeilenGeladen+1;
+   endif;
+end;
+
+LogOutput( 'INFO', 'Eingeladene Zeilen: '|NumberToString(iZaehlerZeilenGeladen));
+
+ODBCClose( 'co1' );  
+#endregion
